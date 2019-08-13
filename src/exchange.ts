@@ -39,13 +39,13 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
       map(addOperationContext),
       tap(handleOperation),
       forward,
-      map(handleResponse),
+      map(addOperationResponseContext),
       tap(handleOperation)
     );
   };
 };
 
-const handleResponse = (op: OperationResult): OperationResult => {
+const addOperationResponseContext = (op: OperationResult): OperationResult => {
   return {
     ...op,
     operation: {
@@ -54,7 +54,8 @@ const handleResponse = (op: OperationResult): OperationResult => {
         ...op.operation.context,
         meta: {
           ...op.operation.context.meta,
-          networkLatency: Date.now() - op.operation.context.meta.startTime,
+          // @ts-ignore
+          networkLatency: Date.now() - op.operation.context.meta.startTime
         }
       }
     }
@@ -69,6 +70,7 @@ const addOperationContext = (op: Operation): Operation => {
       meta: {
         ...op.context.meta,
         source: getDisplayName(),
+        // @ts-ignore
         startTime: Date.now(),
       }
     }
