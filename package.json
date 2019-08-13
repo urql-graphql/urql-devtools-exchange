@@ -1,10 +1,9 @@
 {
   "name": "@urql/devtools",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "index.js",
   "types": "dist/index.d.ts",
   "description": "The exchange for use with Urql Devtools",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,12 +24,15 @@
   },
   "homepage": "https://github.com/FormidableLabs/urql-devtools-exchange#readme",
   "devDependencies": {
+    "@types/node": "^12.7.1",
     "graphql": "^14.4.2",
     "prettier": "^1.18.2",
+    "react": "^16.9.0",
     "typescript": "^3.5.3",
     "urql": "^1.2.0"
   },
   "peerDependencies": {
+    "react": ">= 16.8.0",
     "urql": ">= 1.2.0"
   }
 }
