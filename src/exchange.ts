@@ -1,4 +1,4 @@
-import { pipe, tap, toPromise } from "wonka";
+import { map, pipe, tap, toPromise } from "wonka";
 import {
   Exchange,
   Client,
@@ -36,7 +36,7 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
   return ops$ => {
     return pipe(
       ops$,
-      tap(addOperationContext),
+      map(addOperationContext),
       tap(handleOperation),
       forward,
       tap(handleOperation)
