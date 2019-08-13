@@ -36,12 +36,26 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
   return ops$ => {
     return pipe(
       ops$,
+      tap(addOperationContext),
       tap(handleOperation),
       forward,
       tap(handleOperation)
     );
   };
 };
+
+const addOperationContext = (op: Operation): Operation => {
+  return {
+    ...op,
+    context: {
+      ...op.context,
+      meta: {
+        ...op.context.meta,
+        source: getDisplayName(),
+      }
+    }
+  }
+}
 
 /** Handle operation or response from stream. */
 const handleOperation = <T extends Operation | OperationResult>(op: T) => {
@@ -73,13 +87,6 @@ const parseStreamData = <T extends Operation | OperationResult>(op: T) => {
 
   // Outgoing operation
   if ("operationName" in op) {
-    (op as Operation).context = {
-      ...(op as Operation).context,
-      meta: {
-        ...(op as Operation).context.meta,
-        source: getDisplayName()
-      }
-    };
     return {
       type: "operation",
       data: op,
