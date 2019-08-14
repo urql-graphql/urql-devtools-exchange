@@ -1,4 +1,4 @@
-import { pipe, tap, toPromise } from "wonka";
+import { map, pipe, tap, toPromise } from "wonka";
 import {
   Exchange,
   Client,
@@ -12,6 +12,7 @@ import {
   ExecuteRequestMessage,
   DevtoolsExchangeIncomingEventType
 } from "./types";
+import { getDisplayName } from "./getDisplayName";
 
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
   if (process.env.NODE_ENV === "production") {
@@ -35,12 +36,26 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
   return ops$ => {
     return pipe(
       ops$,
+      map(addOperationContext),
       tap(handleOperation),
       forward,
       tap(handleOperation)
     );
   };
 };
+
+const addOperationContext = (op: Operation): Operation => {
+  return {
+    ...op,
+    context: {
+      ...op.context,
+      meta: {
+        ...op.context.meta,
+        source: getDisplayName(),
+      }
+    }
+  }
+}
 
 /** Handle operation or response from stream. */
 const handleOperation = <T extends Operation | OperationResult>(op: T) => {
@@ -67,23 +82,29 @@ const messageHandlers = {
 } as const;
 
 /** Creates a DevtoolsExchangeOutgoingMessage from operations/responses. */
-const parseStreamData = <T extends Operation | OperationResult>(
-  op: T
-): DevtoolsExchangeOutgoingMessage => {
+const parseStreamData = <T extends Operation | OperationResult>(op: T) => {
   const timestamp = new Date().valueOf();
 
   // Outgoing operation
   if ("operationName" in op) {
-    return { type: "operation", data: op as Operation, timestamp } as const;
+    return {
+      type: "operation",
+      data: op,
+      timestamp
+    } as const;
   }
 
   // Incoming error
   if ((op as OperationResult).error !== undefined) {
-    return { type: "error", data: op as OperationResult, timestamp } as const;
+    return { type: "error", data: op, timestamp } as const;
   }
 
   // Incoming response
-  return { type: "response", data: op as OperationResult, timestamp } as const;
+  return {
+    type: "response",
+    data: op,
+    timestamp
+  } as const;
 };
 
 const sendToContentScript = (detail: DevtoolsExchangeOutgoingMessage) =>
