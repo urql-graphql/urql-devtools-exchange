@@ -42,10 +42,28 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
       map(addOperationContext),
       tap(handleOperation),
       forward,
+      map(addOperationResponseContext),
       tap(handleOperation)
     );
   };
 };
+
+const addOperationResponseContext = (op: OperationResult): OperationResult => {
+  return {
+    ...op,
+    operation: {
+      ...op.operation,
+      context: {
+        ...op.operation.context,
+        meta: {
+          ...op.operation.context.meta,
+          // @ts-ignore
+          networkLatency: Date.now() - op.operation.context.meta.startTime
+        }
+      }
+    }
+  };
+}
 
 const addOperationContext = (op: Operation): Operation => {
   return {
@@ -55,6 +73,8 @@ const addOperationContext = (op: Operation): Operation => {
       meta: {
         ...op.context.meta,
         source: getDisplayName(),
+        // @ts-ignore
+        startTime: Date.now(),
       }
     }
   }
