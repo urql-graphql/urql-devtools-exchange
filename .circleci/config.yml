@@ -1,0 +1,96 @@
+jobs:
+  install:
+    docker:
+      - image: node:12
+    steps:
+      - checkout
+      - run: yarn
+      - save_cache:
+          key: node-cache-{{ .Revision }}
+          paths:
+            - "node_modules"
+
+  lint:
+    docker:
+      - image: node:12
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-cache-{{ .Revision }}
+      - run: yarn run lint
+
+  prettier:
+    docker:
+      - image: node:12
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-cache-{{ .Revision }}
+      - run: yarn run prettier-check
+
+  build:
+    docker:
+      - image: node:12
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-cache-{{ .Revision }}
+      - run: yarn run build
+      - save_cache:
+          key: build-cache-{{ .Revision }}
+          paths:
+            - "dist"
+
+  deploy:
+    docker:
+      - image: node:12
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - build-cache-{{ .Revision }}
+      - run:
+          command: |
+            node -e "process.env.CIRCLE_TAG === \`v\${require('./package.json').version}\` ? process.exit(0) : (console.error('Tag version does not line up with version in package.json') || process.exit(1))"
+            npm config set "//registry.npmjs.org/:_authToken" "$npm_TOKEN"
+            npm publish --access=public
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - install:
+          filters:
+            tags:
+              only: /.*/
+      - lint:
+          requires:
+            - install
+          filters:
+            tags:
+              only: /.*/
+      - prettier:
+          requires:
+            - install
+          filters:
+            tags:
+              only: /.*/
+      - build:
+          requires:
+            - install
+          filters:
+            tags:
+              only: /.*/
+      - deploy:
+          requires:
+            - install
+            - lint
+            - prettier
+            - build
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/

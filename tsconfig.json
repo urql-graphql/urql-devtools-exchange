@@ -1,8 +1,19 @@
 {
-  "include": ["src"],
   "compilerOptions": {
-    "declaration": true,
+    "esModuleInterop": true,
+    "rootDir": "./src",
+    "baseUrl": ".",
+    "outDir": "dist/cjs",
+    "lib": ["dom", "esnext"],
+    "jsx": "react",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "target": "esnext",
+    "strict": true,
+    "noImplicitAny": false,
+    "noUnusedParameters": true,
     "sourceMap": true,
-    "outDir": "dist"
-  }
+    "pretty": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

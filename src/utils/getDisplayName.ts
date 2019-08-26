@@ -23,10 +23,7 @@ export const getDisplayName = (): string => {
     let Component = owner.type;
 
     // If this is one of our own components then check the parent
-    if (
-      isInternalComponent(Component) &&
-      isComponentFiber(owner._debugOwner)
-    ) {
+    if (isInternalComponent(Component) && isComponentFiber(owner._debugOwner)) {
       Component = owner._debugOwner.type;
     }
 
