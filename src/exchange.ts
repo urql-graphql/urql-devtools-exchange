@@ -4,15 +4,17 @@ import {
   Client,
   Operation,
   OperationResult,
-  createRequest
+  createRequest,
+  OperationDebugMeta
 } from "urql";
 import {
   DevtoolsExchangeOutgoingMessage,
   DevtoolsExchangeOutgoingEventType,
   ExecuteRequestMessage,
-  DevtoolsExchangeIncomingEventType
+  DevtoolsExchangeIncomingEventType,
+  DevtoolsExchangeIncomingMessage
 } from "./types";
-import { getDisplayName } from "./getDisplayName";
+import { getDisplayName } from "./utils";
 
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
   if (process.env.NODE_ENV === "production") {
@@ -27,13 +29,11 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
   window.__urql__.url = client.url;
 
   // Listen for messages from content script
-  window.addEventListener(
-    DevtoolsExchangeIncomingEventType,
-    (e: CustomEvent) => {
-      const handler = messageHandlers[e.detail.type];
-      handler && handler(client)(e.detail);
-    }
-  );
+  window.addEventListener(DevtoolsExchangeIncomingEventType, event => {
+    const e = event as CustomEvent<DevtoolsExchangeIncomingMessage>;
+    const handler = messageHandlers[e.detail.type];
+    handler && handler(client)(e.detail);
+  });
   sendToContentScript({ type: "init" });
 
   return ops$ => {
@@ -48,37 +48,34 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
   };
 };
 
-const addOperationResponseContext = (op: OperationResult): OperationResult => {
-  return {
-    ...op,
-    operation: {
-      ...op.operation,
-      context: {
-        ...op.operation.context,
-        meta: {
-          ...op.operation.context.meta,
-          // @ts-ignore
-          networkLatency: Date.now() - op.operation.context.meta.startTime
-        }
-      }
-    }
-  };
-}
-
-const addOperationContext = (op: Operation): Operation => {
-  return {
-    ...op,
+const addOperationResponseContext = (op: OperationResult): OperationResult => ({
+  ...op,
+  operation: {
+    ...op.operation,
     context: {
-      ...op.context,
+      ...op.operation.context,
       meta: {
-        ...op.context.meta,
-        source: getDisplayName(),
-        // @ts-ignore
-        startTime: Date.now(),
+        ...op.operation.context.meta,
+        networkLatency:
+          Date.now() -
+          ((op.operation.context.meta as OperationDebugMeta)
+            .startTime as number)
       }
     }
   }
-}
+});
+
+const addOperationContext = (op: Operation): Operation => ({
+  ...op,
+  context: {
+    ...op.context,
+    meta: {
+      ...op.context.meta,
+      source: getDisplayName(),
+      startTime: Date.now()
+    }
+  }
+});
 
 /** Handle operation or response from stream. */
 const handleOperation = <T extends Operation | OperationResult>(op: T) => {
