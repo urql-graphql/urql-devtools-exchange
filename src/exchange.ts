@@ -4,7 +4,8 @@ import {
   Client,
   Operation,
   OperationResult,
-  createRequest
+  createRequest,
+  OperationDebugMeta
 } from "urql";
 import {
   DevtoolsExchangeOutgoingMessage,
@@ -13,7 +14,7 @@ import {
   DevtoolsExchangeIncomingEventType,
   DevtoolsExchangeIncomingMessage
 } from "./types";
-import { getDisplayName } from "./getDisplayName";
+import { getDisplayName } from "./utils";
 
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
   if (process.env.NODE_ENV === "production") {
@@ -23,6 +24,9 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
         forward
       );
   }
+
+  // Expose graphql url for introspection
+  window.__urql__.url = client.url;
 
   // Listen for messages from content script
   window.addEventListener(DevtoolsExchangeIncomingEventType, event => {
@@ -38,23 +42,40 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
       map(addOperationContext),
       tap(handleOperation),
       forward,
+      map(addOperationResponseContext),
       tap(handleOperation)
     );
   };
 };
 
-const addOperationContext = (op: Operation): Operation => {
-  return {
-    ...op,
+const addOperationResponseContext = (op: OperationResult): OperationResult => ({
+  ...op,
+  operation: {
+    ...op.operation,
     context: {
-      ...op.context,
+      ...op.operation.context,
       meta: {
-        ...op.context.meta,
-        source: getDisplayName()
+        ...op.operation.context.meta,
+        networkLatency:
+          Date.now() -
+          ((op.operation.context.meta as OperationDebugMeta)
+            .startTime as number)
       }
     }
-  };
-};
+  }
+});
+
+const addOperationContext = (op: Operation): Operation => ({
+  ...op,
+  context: {
+    ...op.context,
+    meta: {
+      ...op.context.meta,
+      source: getDisplayName(),
+      startTime: Date.now()
+    }
+  }
+});
 
 /** Handle operation or response from stream. */
 const handleOperation = <T extends Operation | OperationResult>(op: T) => {
