@@ -1,5 +1,5 @@
 interface Window {
-  __urql__: {
+  __urql__?: {
     url: string;
   };
 }
