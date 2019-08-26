@@ -10,12 +10,12 @@
   <br />
 </div>
 
-The official devtools exchange for use with [Urql Devtools](https://github.com/FormidableLabs/urql-devtools).
+The official devtools exchange for use with [Urql Devtools chrome extension](https://github.com/FormidableLabs/urql-devtools).
 
 ### Requirements
 
 - [Urql](https://github.com/FormidableLabs/urql) _v1.2.0_ (or later)
-- [Urql Devtools](https://github.com/FormidableLabs/urql-devtools)
+- [Urql Devtools chrome extension](https://github.com/FormidableLabs/urql-devtools)
 
 ### Usage
 
