@@ -10,7 +10,8 @@ import {
   DevtoolsExchangeOutgoingMessage,
   DevtoolsExchangeOutgoingEventType,
   ExecuteRequestMessage,
-  DevtoolsExchangeIncomingEventType
+  DevtoolsExchangeIncomingEventType,
+  DevtoolsExchangeIncomingMessage
 } from "./types";
 import { getDisplayName } from "./getDisplayName";
 
@@ -24,13 +25,11 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
   }
 
   // Listen for messages from content script
-  window.addEventListener(
-    DevtoolsExchangeIncomingEventType,
-    (e: CustomEvent) => {
-      const handler = messageHandlers[e.detail.type];
-      handler && handler(client)(e.detail);
-    }
-  );
+  window.addEventListener(DevtoolsExchangeIncomingEventType, event => {
+    const e = event as CustomEvent<DevtoolsExchangeIncomingMessage>;
+    const handler = messageHandlers[e.detail.type];
+    handler && handler(client)(e.detail);
+  });
   sendToContentScript({ type: "init" });
 
   return ops$ => {
@@ -51,11 +50,11 @@ const addOperationContext = (op: Operation): Operation => {
       ...op.context,
       meta: {
         ...op.context.meta,
-        source: getDisplayName(),
+        source: getDisplayName()
       }
     }
-  }
-}
+  };
+};
 
 /** Handle operation or response from stream. */
 const handleOperation = <T extends Operation | OperationResult>(op: T) => {
