@@ -1,6 +1,6 @@
 {
   "name": "@urql/devtools",
-  "version": "1.0.0",
+  "version": "0.1.0-beta.0",
   "description": "The exchange for use with Urql Devtools",
   "main": "dist/urql-devtools-exchange.js",
   "module": "dist/urql-devtools-exchange.es.js",
@@ -19,13 +19,8 @@
     "type": "git",
     "url": "git+https://github.com/FormidableLabs/urql-devtools-exchange.git"
   },
-  "keywords": [
-    "devtools",
-    "urql",
-    "graphql",
-    "exchange"
-  ],
-  "author": "",
+  "keywords": ["devtools", "urql", "graphql", "exchange"],
+  "author": "Formidable",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/FormidableLabs/urql-devtools-exchange/issues"
