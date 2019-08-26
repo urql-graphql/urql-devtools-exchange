@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "noUnusedLocals": true,
     "rootDir": "./src",
     "baseUrl": ".",
     "outDir": "dist/cjs",

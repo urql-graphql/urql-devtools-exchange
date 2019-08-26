@@ -2,7 +2,7 @@
 !LICENSE
 !CHANGELOG.md
 !README.md
-!/dist/**/*.{d.ts,js,js.map}
+!/dist
 !/src/**/*.{d.ts,ts,tsx}
 __snapshots__/
 __tests__/
