@@ -25,11 +25,16 @@ export interface InitMessage {
   type: "init";
 }
 
+export interface DisconnectMessage {
+  type: "disconnect";
+}
+
 /** Messages being sent by the devtools exchange to the content script. */
 export type DevtoolsExchangeOutgoingMessage =
   | OperationMessage
   | OperationResponseMessage
   | OperationErrorMessage
+  | DisconnectMessage
   | InitMessage;
 
 /** Event type associated with events triggered by the exchange. */
