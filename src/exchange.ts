@@ -17,7 +17,7 @@ import {
 import { getDisplayName } from "./utils";
 
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" || typeof window === undefined) {
     return ops$ =>
       pipe(
         ops$,
@@ -26,11 +26,9 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
   }
 
   // Expose graphql url for introspection
-  if (typeof window !== undefined) {
-    window.__urql__ = {
-      url: client.url
-    };
-  }
+  window.__urql__ = {
+    url: client.url
+  };
 
   // Listen for messages from content script
   window.addEventListener(DevtoolsExchangeIncomingEventType, event => {
