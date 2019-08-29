@@ -17,7 +17,7 @@ import {
 import { getDisplayName } from "./utils";
 
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" || typeof window === undefined) {
     return ops$ =>
       pipe(
         ops$,
