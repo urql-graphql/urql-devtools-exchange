@@ -73,7 +73,7 @@ const addOperationContext = (op: Operation): Operation => ({
     ...op.context,
     meta: {
       ...op.context.meta,
-      source: getDisplayName(),
+      source: (op.context.meta && op.context.meta.source) || getDisplayName(),
       startTime: Date.now()
     }
   }
