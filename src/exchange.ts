@@ -1,4 +1,4 @@
-import { map, pipe, tap, toPromise } from "wonka";
+import { map, pipe, tap, toPromise, take, filter } from "wonka";
 import {
   Exchange,
   Client,
@@ -15,14 +15,12 @@ import {
   DevtoolsExchangeIncomingMessage
 } from "./types";
 import { getDisplayName } from "./utils";
+import { hash } from "./utils/hash";
+import { parse } from "graphql";
 
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
   if (typeof window === "undefined") {
-    return ops$ =>
-      pipe(
-        ops$,
-        forward
-      );
+    return ops$ => pipe(ops$, forward);
   }
 
   // Expose graphql url for introspection
@@ -32,6 +30,7 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
 
   // Listen for messages from content script
   window.addEventListener(DevtoolsExchangeIncomingEventType, event => {
+    console.log(event);
     const e = event as CustomEvent<DevtoolsExchangeIncomingMessage>;
     const handler = messageHandlers[e.detail.type];
     handler && handler(client)(e.detail);
@@ -42,6 +41,7 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
     return pipe(
       ops$,
       map(addOperationContext),
+      filter(o => o.context.meta!.source !== "Devtools"),
       tap(handleOperation),
       forward,
       map(addOperationResponseContext),
@@ -88,12 +88,26 @@ const handleOperation = <T extends Operation | OperationResult>(op: T) => {
 /** Handles execute request messages. */
 const requestHandler = (client: Client) => (message: ExecuteRequestMessage) => {
   const isMutation = /(^|\W)+mutation\W/.test(message.query);
-  const execFn = isMutation ? client.executeMutation : client.executeQuery;
+  const requestType = isMutation ? "mutation" : "query";
+  const op = client.createRequestOperation(
+    requestType,
+    {
+      key: hash(JSON.stringify(message.query)),
+      query: parse(message.query)
+    },
+    {
+      meta: {
+        source: "Devtools"
+      }
+    }
+  );
 
+  handleOperation(op);
   pipe(
-    execFn(createRequest(message.query), {
-      meta: { source: "Devtools" }
-    }),
+    client.executeRequestOperation(op),
+    tap(op => console.log("handling op", op)),
+    tap(handleOperation),
+    take(1),
     toPromise
   );
 };
