@@ -33,11 +33,7 @@ describe("on mount", () => {
   const [ops$] = makeSubject<any>();
 
   beforeEach(() => {
-    pipe(
-      ops$,
-      devtoolsExchange({ client, forward }),
-      publish
-    );
+    pipe(ops$, devtoolsExchange({ client, forward }), publish);
   });
 
   describe("window", () => {
@@ -69,11 +65,7 @@ describe("on event", () => {
   const [sub, next] = makeSubject<any>();
 
   beforeEach(() => {
-    pipe(
-      sub,
-      devtoolsExchange({ client, forward }),
-      publish
-    );
+    pipe(sub, devtoolsExchange({ client, forward }), publish);
   });
 
   describe("on operation", () => {
@@ -137,11 +129,7 @@ describe("on request message", () => {
   };
 
   beforeEach(() => {
-    pipe(
-      sub,
-      devtoolsExchange({ client, forward }),
-      publish
-    );
+    pipe(sub, devtoolsExchange({ client, forward }), publish);
     handler = addEventListener.mock.calls[0][1];
   });
 

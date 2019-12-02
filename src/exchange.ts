@@ -19,11 +19,7 @@ import { parse } from "graphql";
 
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
   if (typeof window === "undefined") {
-    return ops$ =>
-      pipe(
-        ops$,
-        forward
-      );
+    return ops$ => pipe(ops$, forward);
   }
 
   // Expose graphql url for introspection
