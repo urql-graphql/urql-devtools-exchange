@@ -11,6 +11,7 @@
     "clean": "rimraf ./dist ./node_modules/.cache",
     "build": "rollup -c rollup.config.js",
     "watch": "rollup -w -c rollup.config.js",
+    "test": "jest",
     "lint": "eslint . --ext .ts,.tsx",
     "check": "tsc --noEmit",
     "prettier-check": "prettier -c src/** README.md",
