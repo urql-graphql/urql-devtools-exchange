@@ -4,7 +4,6 @@ import {
   Client,
   Operation,
   OperationResult,
-  createRequest,
   OperationDebugMeta
 } from "urql";
 import {
@@ -20,7 +19,11 @@ import { parse } from "graphql";
 
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
   if (typeof window === "undefined") {
-    return ops$ => pipe(ops$, forward);
+    return ops$ =>
+      pipe(
+        ops$,
+        forward
+      );
   }
 
   // Expose graphql url for introspection
@@ -30,7 +33,6 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
 
   // Listen for messages from content script
   window.addEventListener(DevtoolsExchangeIncomingEventType, event => {
-    console.log(event);
     const e = event as CustomEvent<DevtoolsExchangeIncomingMessage>;
     const handler = messageHandlers[e.detail.type];
     handler && handler(client)(e.detail);
@@ -41,7 +43,7 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
     return pipe(
       ops$,
       map(addOperationContext),
-      filter(o => o.context.meta!.source !== "Devtools"),
+      filter(o => !o.context.meta || o.context.meta.source !== "Devtools"),
       tap(handleOperation),
       forward,
       map(addOperationResponseContext),
@@ -105,7 +107,6 @@ const requestHandler = (client: Client) => (message: ExecuteRequestMessage) => {
   handleOperation(op);
   pipe(
     client.executeRequestOperation(op),
-    tap(op => console.log("handling op", op)),
     tap(handleOperation),
     take(1),
     toPromise
@@ -119,7 +120,7 @@ const messageHandlers = {
 
 /** Creates a DevtoolsExchangeOutgoingMessage from operations/responses. */
 const parseStreamData = <T extends Operation | OperationResult>(op: T) => {
-  const timestamp = new Date().valueOf();
+  const timestamp = Date.now();
 
   // Outgoing operation
   if ("operationName" in op) {
