@@ -1,10 +1,9 @@
-import { map, pipe, tap, toPromise } from "wonka";
+import { map, pipe, tap, toPromise, take, filter } from "wonka";
 import {
   Exchange,
   Client,
   Operation,
   OperationResult,
-  createRequest,
   OperationDebugMeta
 } from "urql";
 import {
@@ -15,6 +14,8 @@ import {
   DevtoolsExchangeIncomingMessage
 } from "./types";
 import { getDisplayName } from "./utils";
+import { hash } from "./utils/hash";
+import { parse } from "graphql";
 
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
   if (typeof window === "undefined") {
@@ -42,6 +43,7 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
     return pipe(
       ops$,
       map(addOperationContext),
+      filter(o => !o.context.meta || o.context.meta.source !== "Devtools"),
       tap(handleOperation),
       forward,
       map(addOperationResponseContext),
@@ -88,12 +90,25 @@ const handleOperation = <T extends Operation | OperationResult>(op: T) => {
 /** Handles execute request messages. */
 const requestHandler = (client: Client) => (message: ExecuteRequestMessage) => {
   const isMutation = /(^|\W)+mutation\W/.test(message.query);
-  const execFn = isMutation ? client.executeMutation : client.executeQuery;
+  const requestType = isMutation ? "mutation" : "query";
+  const op = client.createRequestOperation(
+    requestType,
+    {
+      key: hash(JSON.stringify(message.query)),
+      query: parse(message.query)
+    },
+    {
+      meta: {
+        source: "Devtools"
+      }
+    }
+  );
 
+  handleOperation(op);
   pipe(
-    execFn(createRequest(message.query), {
-      meta: { source: "Devtools" }
-    }),
+    client.executeRequestOperation(op),
+    tap(handleOperation),
+    take(1),
     toPromise
   );
 };
@@ -105,7 +120,7 @@ const messageHandlers = {
 
 /** Creates a DevtoolsExchangeOutgoingMessage from operations/responses. */
 const parseStreamData = <T extends Operation | OperationResult>(op: T) => {
-  const timestamp = new Date().valueOf();
+  const timestamp = Date.now();
 
   // Outgoing operation
   if ("operationName" in op) {
