@@ -1,0 +1,147 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`on event on operation dispatches operation event 1`] = `
+Object {
+  "detail": Object {
+    "data": Object {
+      "context": Object {
+        "meta": Object {
+          "source": "Component",
+          "startTime": 1234,
+        },
+      },
+      "key": 1234,
+      "operationName": "query",
+      "query": "query",
+      "variables": Object {
+        "someVar": "1234",
+      },
+    },
+    "timestamp": 1234,
+    "type": "operation",
+  },
+  "type": "urql-devtools-exchange",
+}
+`;
+
+exports[`on event on response dispatches response event 1`] = `
+Object {
+  "detail": Object {
+    "data": Object {
+      "data": Object {
+        "stubData": "here",
+      },
+      "operation": Object {
+        "context": Object {
+          "meta": Object {
+            "networkLatency": 0,
+            "source": "Component",
+            "startTime": 1234,
+          },
+        },
+        "key": 1234,
+        "operationName": "query",
+        "query": "query",
+        "variables": Object {
+          "someVar": "1234",
+        },
+      },
+    },
+    "timestamp": 1234,
+    "type": "response",
+  },
+  "type": "urql-devtools-exchange",
+}
+`;
+
+exports[`on request message incoming operation is dispatched 1`] = `
+Object {
+  "detail": Object {
+    "data": Object {
+      "context": Object {
+        "meta": Object {
+          "meta": Object {
+            "source": "Devtools",
+          },
+        },
+      },
+      "key": 487904461,
+      "operationName": "query",
+      "query": Object {
+        "definitions": Array [
+          Object {
+            "directives": Array [],
+            "kind": "OperationDefinition",
+            "loc": Object {
+              "end": 54,
+              "start": 0,
+            },
+            "operation": "query",
+            "selectionSet": Object {
+              "kind": "SelectionSet",
+              "loc": Object {
+                "end": 54,
+                "start": 6,
+              },
+              "selections": Array [
+                Object {
+                  "arguments": Array [],
+                  "directives": Array [],
+                  "kind": "Field",
+                  "loc": Object {
+                    "end": 46,
+                    "start": 16,
+                  },
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": Object {
+                      "end": 21,
+                      "start": 16,
+                    },
+                    "value": "todos",
+                  },
+                  "selectionSet": Object {
+                    "kind": "SelectionSet",
+                    "loc": Object {
+                      "end": 46,
+                      "start": 22,
+                    },
+                    "selections": Array [
+                      Object {
+                        "arguments": Array [],
+                        "directives": Array [],
+                        "kind": "Field",
+                        "loc": Object {
+                          "end": 36,
+                          "start": 34,
+                        },
+                        "name": Object {
+                          "kind": "Name",
+                          "loc": Object {
+                            "end": 36,
+                            "start": 34,
+                          },
+                          "value": "id",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+            "variableDefinitions": Array [],
+          },
+        ],
+        "kind": "Document",
+        "loc": Object {
+          "end": 54,
+          "start": 0,
+        },
+      },
+    },
+    "timestamp": 1234,
+    "type": "operation",
+  },
+  "type": "urql-devtools-exchange",
+}
+`;

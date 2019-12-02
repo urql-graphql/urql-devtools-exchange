@@ -30,6 +30,16 @@ jobs:
             - node-cache-{{ .Revision }}
       - run: yarn run prettier-check
 
+  test:
+    docker:
+      - image: node:12
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-cache-{{ .Revision }}
+      - run: yarn test
+
   build:
     docker:
       - image: node:12
@@ -77,6 +87,12 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - test:
+          requires:
+            - install
+          filters:
+            tags:
+              only: /.*/
       - build:
           requires:
             - install
@@ -89,6 +105,7 @@ workflows:
             - lint
             - prettier
             - build
+            - test
           filters:
             tags:
               only: /.*/
