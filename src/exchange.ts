@@ -1,4 +1,4 @@
-import { map, pipe, tap, toPromise, take, filter } from "wonka";
+import { map, pipe, tap, toPromise, take, filter, merge, share } from "wonka";
 import {
   Exchange,
   Client,
@@ -36,15 +36,27 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
   sendToContentScript({ type: "init" });
 
   return ops$ => {
-    return pipe(
-      ops$,
-      map(addOperationContext),
-      filter(o => !o.context.meta || o.context.meta.source !== "Devtools"),
+    const sharedOps$ = pipe(share(ops$), map(addOperationContext));
+
+    const isDevtoolsOp = (o: Operation) =>
+      Boolean(o.context.meta && o.context.meta.source === "Devtools");
+
+    const appOps$ = pipe(
+      sharedOps$,
+      filter(o => !isDevtoolsOp(o)),
       tap(handleOperation),
       forward,
       map(addOperationResponseContext),
       tap(handleOperation)
     );
+
+    const devtoolsOps$ = pipe(
+      sharedOps$,
+      filter(o => isDevtoolsOp(o)),
+      forward
+    );
+
+    return merge([appOps$, devtoolsOps$]);
   };
 };
 
