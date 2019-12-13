@@ -36,7 +36,7 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
   sendToContentScript({ type: "init" });
 
   return ops$ => {
-    const sharedOps$ = pipe(share(ops$), map(addOperationContext));
+    const sharedOps$ = pipe(ops$, map(addOperationContext), share);
 
     const isDevtoolsOp = (o: Operation) =>
       Boolean(o.context.meta && o.context.meta.source === "Devtools");
