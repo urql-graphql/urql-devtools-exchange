@@ -1,6 +1,18 @@
 # Changelog
 
-## [v0.1.1](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v0.1.1)
+## [v0.1.2](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v0.1.2) (2019-12-13)
+
+[Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v0.1.1...v0.1.2)
+
+**Fixed bugs:**
+
+- Add forwarding of devtools ops [\#17](https://github.com/FormidableLabs/urql-devtools-exchange/pull/17) ([andyrichardson](https://github.com/andyrichardson))
+
+**Closed issues:**
+
+- Installing Devtools exchange doesnt work as expected [\#12](https://github.com/FormidableLabs/urql-devtools-exchange/issues/12)
+
+## [v0.1.1](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v0.1.1) (2019-12-02)
 
 [Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v0.1.0...v0.1.1)
 
