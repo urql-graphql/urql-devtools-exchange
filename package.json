@@ -89,7 +89,7 @@
   },
   "peerDependencies": {
     "react": ">= 16.8.0",
-    "@urql/core": ">= 1.2.0"
+    "@urql/core": ">= 1.9.0"
   },
   "dependencies": {
     "wonka": "^3.2.1"
