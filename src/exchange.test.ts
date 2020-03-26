@@ -7,18 +7,18 @@ const client = {
     operationName,
     ...data,
     context: {
-      meta
-    }
+      meta,
+    },
   })),
-  executeRequestOperation: jest.fn(operation => ({
+  executeRequestOperation: jest.fn((operation) => ({
     operation,
-    data: { stubData: "here" }
-  }))
+    data: { stubData: "here" },
+  })),
 } as any;
-const forward = jest.fn().mockImplementation(o =>
-  map(operation => ({
+const forward = jest.fn().mockImplementation((o) =>
+  map((operation) => ({
     operation,
-    data: { stubData: "here" }
+    data: { stubData: "here" },
   }))(o)
 ) as any;
 const addEventListener = jest.spyOn(window, "addEventListener");
@@ -54,8 +54,8 @@ describe("on mount", () => {
       expect(window.dispatchEvent).toBeCalledWith({
         type: "urql-devtools-exchange",
         detail: {
-          type: "init"
-        }
+          type: "init",
+        },
       });
     });
   });
@@ -74,9 +74,9 @@ describe("on event", () => {
       query: "query",
       variables: { someVar: "1234" },
       context: {
-        meta: {}
+        meta: {},
       },
-      operationName: "query"
+      operationName: "query",
     };
     beforeEach(() => {
       next(op);
@@ -96,9 +96,9 @@ describe("on event", () => {
       query: "query",
       variables: { someVar: "1234" },
       context: {
-        meta: {}
+        meta: {},
       },
-      operationName: "query"
+      operationName: "query",
     };
     beforeEach(() => {
       next(op);
@@ -124,8 +124,8 @@ describe("on request message", () => {
         todos {
           id
         }
-      }`
-    }
+      }`,
+    },
   };
 
   beforeEach(() => {

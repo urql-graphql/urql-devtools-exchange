@@ -1,8 +1,8 @@
 global.window = {
-  addEventListener: jest.fn()
+  addEventListener: jest.fn(),
 };
 
 (global as any).CustomEvent = jest.fn((...args) => ({
   type: args[0],
-  ...args[1]
+  ...args[1],
 }));

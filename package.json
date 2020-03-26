@@ -14,7 +14,7 @@
     "test": "jest",
     "lint": "eslint . --ext .ts,.tsx",
     "check": "tsc --noEmit",
-    "prettier-check": "prettier -c src/** README.md",
+    "prettier-check": "prettier -c src README.md",
     "prepublishOnly": "run-s clean build",
     "changelog": "docker run -it --rm -v \"$(pwd)\":/usr/local/src/your-app ferrarimarco/github-changelog-generator -u FormidableLabs -p urql-devtools-exchange"
   },
