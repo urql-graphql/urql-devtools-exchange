@@ -37,7 +37,7 @@ import {
   createClient,
   dedupExchange,
   fetchExchange
-} from "urql";
+} from "@urql/core";
 import { devtoolsExchange } from "<path-to-devtools-dist>/exchange";
 
 // ...
@@ -87,5 +87,5 @@ git push origin v0.0.0
 
 Finally, navigate to [releases](https://github.com/FormidableLabs/urql-devtools/releases) and choose _draft a new release_.
 
- * You can copy and paste the release notes from the changelog you just generated
- * Attatching the published assets is also a good idea - `wget $(npm view @urql/devtools dist.tarball)`
+- You can copy and paste the release notes from the changelog you just generated
+- Attatching the published assets is also a good idea - `wget $(npm view @urql/devtools dist.tarball)`

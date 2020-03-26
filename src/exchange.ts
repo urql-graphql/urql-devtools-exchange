@@ -5,7 +5,7 @@ import {
   Operation,
   OperationResult,
   OperationDebugMeta
-} from "urql";
+} from "@urql/core";
 import {
   DevtoolsExchangeOutgoingMessage,
   DevtoolsExchangeOutgoingEventType,

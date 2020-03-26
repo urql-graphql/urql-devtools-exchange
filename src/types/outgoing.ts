@@ -1,4 +1,4 @@
-import { Operation, OperationResult } from "urql";
+import { Operation, OperationResult } from "@urql/core";
 
 /** Dispatched when an operation is dispatched in the urql client. */
 export interface OperationMessage {
