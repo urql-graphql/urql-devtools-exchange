@@ -30,10 +30,10 @@ jest.spyOn(Date, "now").mockReturnValue(1234);
 beforeEach(jest.clearAllMocks);
 
 describe("on mount", () => {
-  const [ops$] = makeSubject<any>();
+  const { source } = makeSubject<any>();
 
   beforeEach(() => {
-    pipe(ops$, devtoolsExchange({ client, forward }), publish);
+    pipe(source, devtoolsExchange({ client, forward }), publish);
   });
 
   describe("window", () => {
@@ -62,10 +62,10 @@ describe("on mount", () => {
 });
 
 describe("on event", () => {
-  const [sub, next] = makeSubject<any>();
+  const { source, next } = makeSubject<any>();
 
   beforeEach(() => {
-    pipe(sub, devtoolsExchange({ client, forward }), publish);
+    pipe(source, devtoolsExchange({ client, forward }), publish);
   });
 
   describe("on operation", () => {
@@ -116,7 +116,7 @@ describe("on event", () => {
 // Execute request from devtools
 describe("on request message", () => {
   let handler: any;
-  const [sub] = makeSubject<any>();
+  const { source } = makeSubject<any>();
   const requestMessage = {
     detail: {
       type: "request",
@@ -129,7 +129,7 @@ describe("on request message", () => {
   };
 
   beforeEach(() => {
-    pipe(sub, devtoolsExchange({ client, forward }), publish);
+    pipe(source, devtoolsExchange({ client, forward }), publish);
     handler = addEventListener.mock.calls[0][1];
   });
 
