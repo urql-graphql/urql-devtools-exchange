@@ -36,13 +36,11 @@
   "homepage": "https://github.com/FormidableLabs/urql-devtools-exchange#readme",
   "lint-staged": {
     "*.{json,md}": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ],
     "*.{ts,tsx}": [
       "eslint --fix",
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   },
   "husky": {
