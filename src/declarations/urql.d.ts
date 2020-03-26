@@ -1,6 +1,6 @@
-import { OperationDebugMeta } from "@urql/core";
+import { OperationDebugMeta } from '@urql/core';
 
-declare module "urql" {
+declare module 'urql' {
   export interface OperationDebugMeta {
     startTime?: number;
   }

@@ -1,32 +1,32 @@
-import { Operation, OperationResult } from "@urql/core";
+import { Operation, OperationResult } from '@urql/core';
 
 /** Dispatched when an operation is dispatched in the urql client. */
 export interface OperationMessage {
-  type: "operation";
+  type: 'operation';
   data: Operation;
   timestamp: number;
 }
 
 /** Dispatched when an operation result without an error has been returned. */
 export interface OperationResponseMessage {
-  type: "response";
+  type: 'response';
   data: OperationResult;
   timestamp: number;
 }
 
 /** Dispatched when an operation result with an error has been returned. */
 export interface OperationErrorMessage {
-  type: "error";
+  type: 'error';
   data: OperationResult;
   timestamp: number;
 }
 
 export interface InitMessage {
-  type: "init";
+  type: 'init';
 }
 
 export interface DisconnectMessage {
-  type: "disconnect";
+  type: 'disconnect';
 }
 
 /** Messages being sent by the devtools exchange to the content script. */
@@ -38,4 +38,4 @@ export type DevtoolsExchangeOutgoingMessage =
   | InitMessage;
 
 /** Event type associated with events triggered by the exchange. */
-export const DevtoolsExchangeOutgoingEventType = "urql-devtools-exchange" as const;
+export const DevtoolsExchangeOutgoingEventType = 'urql-devtools-exchange' as const;

@@ -1,24 +1,24 @@
-import { map, pipe, tap, toPromise, take, filter, merge, share } from "wonka";
+import { map, pipe, tap, toPromise, take, filter, merge, share } from 'wonka';
 import {
   Exchange,
   Client,
   Operation,
   OperationResult,
   OperationDebugMeta,
-} from "@urql/core";
+} from '@urql/core';
 import {
   DevtoolsExchangeOutgoingMessage,
   DevtoolsExchangeOutgoingEventType,
   ExecuteRequestMessage,
   DevtoolsExchangeIncomingEventType,
   DevtoolsExchangeIncomingMessage,
-} from "./types";
-import { getDisplayName } from "./utils";
-import { hash } from "./utils/hash";
-import { parse } from "graphql";
+} from './types';
+import { getDisplayName } from './utils';
+import { hash } from './utils/hash';
+import { parse } from 'graphql';
 
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     return (ops$) => pipe(ops$, forward);
   }
 
@@ -33,13 +33,13 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
     const handler = messageHandlers[e.detail.type];
     handler && handler(client)(e.detail);
   });
-  sendToContentScript({ type: "init" });
+  sendToContentScript({ type: 'init' });
 
   return (ops$) => {
     const sharedOps$ = pipe(ops$, map(addOperationContext), share);
 
     const isDevtoolsOp = (o: Operation) =>
-      Boolean(o.context.meta && o.context.meta.source === "Devtools");
+      Boolean(o.context.meta && o.context.meta.source === 'Devtools');
 
     const appOps$ = pipe(
       sharedOps$,
@@ -98,7 +98,7 @@ const handleOperation = <T extends Operation | OperationResult>(op: T) => {
 /** Handles execute request messages. */
 const requestHandler = (client: Client) => (message: ExecuteRequestMessage) => {
   const isMutation = /(^|\W)+mutation\W/.test(message.query);
-  const requestType = isMutation ? "mutation" : "query";
+  const requestType = isMutation ? 'mutation' : 'query';
   const op = client.createRequestOperation(
     requestType,
     {
@@ -107,7 +107,7 @@ const requestHandler = (client: Client) => (message: ExecuteRequestMessage) => {
     },
     {
       meta: {
-        source: "Devtools",
+        source: 'Devtools',
       },
     }
   );
@@ -131,9 +131,9 @@ const parseStreamData = <T extends Operation | OperationResult>(op: T) => {
   const timestamp = Date.now();
 
   // Outgoing operation
-  if ("operationName" in op) {
+  if ('operationName' in op) {
     return {
-      type: "operation",
+      type: 'operation',
       data: op,
       timestamp,
     } as const;
@@ -141,12 +141,12 @@ const parseStreamData = <T extends Operation | OperationResult>(op: T) => {
 
   // Incoming error
   if ((op as OperationResult).error !== undefined) {
-    return { type: "error", data: op, timestamp } as const;
+    return { type: 'error', data: op, timestamp } as const;
   }
 
   // Incoming response
   return {
-    type: "response",
+    type: 'response',
     data: op,
     timestamp,
   } as const;

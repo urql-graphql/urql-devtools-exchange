@@ -1,1 +1,1 @@
-export * from "./getDisplayName";
+export * from './getDisplayName';

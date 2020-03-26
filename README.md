@@ -33,15 +33,15 @@ Add the devtools exchange to your urql client
 
 ```tsx
 // ...
-import { defaultExchanges, createClient } from "@urql/core";
-import { devtoolsExchange } from "@urql/devtools";
+import { defaultExchanges, createClient } from '@urql/core';
+import { devtoolsExchange } from '@urql/devtools';
 
 // ...
 const client = createClient({
-  url: "http://localhost:3001/graphql",
+  url: 'http://localhost:3001/graphql',
   exchanges: [
     // replacing devtools with a passthrough exchange for production environments
-    process.env.NODE_ENV !== "production"
+    process.env.NODE_ENV !== 'production'
       ? devtoolsExchange
       : ({ forward }) => forward,
     ...defaultExchanges,

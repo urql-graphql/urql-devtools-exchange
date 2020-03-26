@@ -1,17 +1,17 @@
-import { basename } from "path";
-import { DEFAULT_EXTENSIONS } from "@babel/core";
-import commonjs from "rollup-plugin-commonjs";
-import nodeResolve from "rollup-plugin-node-resolve";
-import typescript from "rollup-plugin-typescript2";
-import buble from "rollup-plugin-buble";
-import babel from "rollup-plugin-babel";
-import { terser } from "rollup-plugin-terser";
+import { basename } from 'path';
+import { DEFAULT_EXTENSIONS } from '@babel/core';
+import commonjs from 'rollup-plugin-commonjs';
+import nodeResolve from 'rollup-plugin-node-resolve';
+import typescript from 'rollup-plugin-typescript2';
+import buble from 'rollup-plugin-buble';
+import babel from 'rollup-plugin-babel';
+import { terser } from 'rollup-plugin-terser';
 
-const pkgInfo = require("./package.json");
+const pkgInfo = require('./package.json');
 const { main, peerDependencies, dependencies } = pkgInfo;
-const name = basename(main, ".js");
+const name = basename(main, '.js');
 
-const external = ["dns", "fs", "path", "url"];
+const external = ['dns', 'fs', 'path', 'url'];
 
 if (pkgInfo.peerDependencies) {
   external.push(...Object.keys(peerDependencies));
@@ -21,9 +21,9 @@ if (pkgInfo.dependencies) {
   external.push(...Object.keys(dependencies));
 }
 
-const externalPredicate = new RegExp(`^(${external.join("|")})($|/)`);
+const externalPredicate = new RegExp(`^(${external.join('|')})($|/)`);
 const externalTest = (id) => {
-  if (id === "babel-plugin-transform-async-to-promises/helpers") {
+  if (id === 'babel-plugin-transform-async-to-promises/helpers') {
     return false;
   }
 
@@ -75,19 +75,19 @@ const terserMinified = terser({
 
 const makePlugins = (isProduction = false) => [
   nodeResolve({
-    mainFields: ["module", "jsnext", "main"],
+    mainFields: ['module', 'jsnext', 'main'],
     browser: true,
   }),
   commonjs({
     ignoreGlobal: true,
     include: /\/node_modules\//,
     namedExports: {
-      react: Object.keys(require("react")),
+      react: Object.keys(require('react')),
     },
   }),
   typescript({
-    typescript: require("typescript"),
-    cacheRoot: "./node_modules/.cache/.rts2_cache",
+    typescript: require('typescript'),
+    cacheRoot: './node_modules/.cache/.rts2_cache',
     useTsconfigDeclarationDir: true,
     tsconfigDefaults: {
       compilerOptions: {
@@ -95,11 +95,11 @@ const makePlugins = (isProduction = false) => [
       },
     },
     tsconfigOverride: {
-      exclude: ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/test-utils/*"],
+      exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/test-utils/*'],
       compilerOptions: {
         declaration: !isProduction,
-        declarationDir: "./dist/types/",
-        target: "es6",
+        declarationDir: './dist/types/',
+        target: 'es6',
       },
     },
   }),
@@ -109,27 +109,27 @@ const makePlugins = (isProduction = false) => [
       dangerousForOf: true,
       dangerousTaggedTemplateString: true,
     },
-    objectAssign: "Object.assign",
-    exclude: "node_modules/**",
+    objectAssign: 'Object.assign',
+    exclude: 'node_modules/**',
   }),
   babel({
     babelrc: false,
-    extensions: [...DEFAULT_EXTENSIONS, "ts", "tsx"],
-    exclude: "node_modules/**",
+    extensions: [...DEFAULT_EXTENSIONS, 'ts', 'tsx'],
+    exclude: 'node_modules/**',
     presets: [],
     plugins: [
-      ["babel-plugin-closure-elimination", {}],
-      ["@babel/plugin-transform-object-assign", {}],
+      ['babel-plugin-closure-elimination', {}],
+      ['@babel/plugin-transform-object-assign', {}],
       [
-        "@babel/plugin-transform-react-jsx",
+        '@babel/plugin-transform-react-jsx',
         {
-          pragma: "React.createElement",
-          pragmaFrag: "React.Fragment",
+          pragma: 'React.createElement',
+          pragmaFrag: 'React.Fragment',
           useBuiltIns: true,
         },
       ],
       [
-        "babel-plugin-transform-async-to-promises",
+        'babel-plugin-transform-async-to-promises',
         {
           inlineHelpers: true,
           externalHelpers: true,
@@ -141,7 +141,7 @@ const makePlugins = (isProduction = false) => [
 ];
 
 const config = {
-  input: "./src/index.ts",
+  input: './src/index.ts',
   external: externalTest,
   treeshake: {
     propertyReadSideEffects: false,
@@ -159,7 +159,7 @@ export default [
         freeze: false,
         esModule: false,
         file: `./dist/${name}.js`,
-        format: "cjs",
+        format: 'cjs',
       },
       {
         sourcemap: true,
@@ -167,7 +167,7 @@ export default [
         freeze: false,
         esModule: false,
         file: `./dist/${name}.es.js`,
-        format: "esm",
+        format: 'esm',
       },
     ],
   },
@@ -180,14 +180,14 @@ export default [
         legacy: true,
         freeze: false,
         file: `./dist/${name}.min.js`,
-        format: "cjs",
+        format: 'cjs',
       },
       {
         sourcemap: true,
         legacy: true,
         freeze: false,
         file: `./dist/${name}.es.min.js`,
-        format: "esm",
+        format: 'esm',
       },
     ],
   },

@@ -1,8 +1,8 @@
-import { devtoolsExchange } from "./exchange";
-import { makeSubject, pipe, publish, map } from "wonka";
+import { devtoolsExchange } from './exchange';
+import { makeSubject, pipe, publish, map } from 'wonka';
 
 const client = {
-  url: "url_stub",
+  url: 'url_stub',
   createRequestOperation: jest.fn((operationName, data, meta) => ({
     operationName,
     ...data,
@@ -12,101 +12,101 @@ const client = {
   })),
   executeRequestOperation: jest.fn((operation) => ({
     operation,
-    data: { stubData: "here" },
+    data: { stubData: 'here' },
   })),
 } as any;
 const forward = jest.fn().mockImplementation((o) =>
   map((operation) => ({
     operation,
-    data: { stubData: "here" },
+    data: { stubData: 'here' },
   }))(o)
 ) as any;
-const addEventListener = jest.spyOn(window, "addEventListener");
+const addEventListener = jest.spyOn(window, 'addEventListener');
 const dispatchEvent = jest
-  .spyOn(window, "dispatchEvent")
+  .spyOn(window, 'dispatchEvent')
   .mockImplementation(() => false);
-jest.spyOn(Date, "now").mockReturnValue(1234);
+jest.spyOn(Date, 'now').mockReturnValue(1234);
 
 beforeEach(jest.clearAllMocks);
 
-describe("on mount", () => {
+describe('on mount', () => {
   const { source } = makeSubject<any>();
 
   beforeEach(() => {
     pipe(source, devtoolsExchange({ client, forward }), publish);
   });
 
-  describe("window", () => {
-    it("has __urql__ property", () => {
-      expect(window).toHaveProperty("__urql__", { url: client.url });
+  describe('window', () => {
+    it('has __urql__ property', () => {
+      expect(window).toHaveProperty('__urql__', { url: client.url });
     });
   });
 
-  describe("event listener", () => {
-    it("is added to window", () => {
+  describe('event listener', () => {
+    it('is added to window', () => {
       expect(addEventListener).toBeCalledTimes(1);
     });
   });
 
-  describe("init event", () => {
-    it("is dispatched", () => {
+  describe('init event', () => {
+    it('is dispatched', () => {
       expect(window.dispatchEvent).toBeCalledTimes(1);
       expect(window.dispatchEvent).toBeCalledWith({
-        type: "urql-devtools-exchange",
+        type: 'urql-devtools-exchange',
         detail: {
-          type: "init",
+          type: 'init',
         },
       });
     });
   });
 });
 
-describe("on event", () => {
+describe('on event', () => {
   const { source, next } = makeSubject<any>();
 
   beforeEach(() => {
     pipe(source, devtoolsExchange({ client, forward }), publish);
   });
 
-  describe("on operation", () => {
+  describe('on operation', () => {
     const op = {
       key: 1234,
-      query: "query",
-      variables: { someVar: "1234" },
+      query: 'query',
+      variables: { someVar: '1234' },
       context: {
         meta: {},
       },
-      operationName: "query",
+      operationName: 'query',
     };
     beforeEach(() => {
       next(op);
     });
 
-    it("dispatches operation event", () => {
+    it('dispatches operation event', () => {
       expect((dispatchEvent.mock.calls[1][0] as any).detail.type).toBe(
-        "operation"
+        'operation'
       );
       expect(dispatchEvent.mock.calls[1][0]).toMatchSnapshot();
     });
   });
 
-  describe("on response", () => {
+  describe('on response', () => {
     const op = {
       key: 1234,
-      query: "query",
-      variables: { someVar: "1234" },
+      query: 'query',
+      variables: { someVar: '1234' },
       context: {
         meta: {},
       },
-      operationName: "query",
+      operationName: 'query',
     };
     beforeEach(() => {
       next(op);
     });
 
-    it("dispatches response event", () => {
+    it('dispatches response event', () => {
       expect((dispatchEvent.mock.calls[2][0] as any).detail.type).toBe(
-        "response"
+        'response'
       );
       expect(dispatchEvent.mock.calls[2][0]).toMatchSnapshot();
     });
@@ -114,12 +114,12 @@ describe("on event", () => {
 });
 
 // Execute request from devtools
-describe("on request message", () => {
+describe('on request message', () => {
   let handler: any;
   const { source } = makeSubject<any>();
   const requestMessage = {
     detail: {
-      type: "request",
+      type: 'request',
       query: `query {
         todos {
           id
@@ -133,13 +133,13 @@ describe("on request message", () => {
     handler = addEventListener.mock.calls[0][1];
   });
 
-  describe("incoming operation", () => {
-    it("is dispatched", () => {
+  describe('incoming operation', () => {
+    it('is dispatched', () => {
       handler(requestMessage);
       expect(dispatchEvent.mock.calls[1][0]).toMatchSnapshot();
     });
 
-    it("is executed", () => {
+    it('is executed', () => {
       handler(requestMessage);
       expect(client.executeRequestOperation).toBeCalledTimes(1);
     });

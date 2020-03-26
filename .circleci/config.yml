@@ -17,12 +17,12 @@ jobs:
       - *node_modules_cache
       - run:
           name: Check for dependencies
-          command: "([[ -d node_modules ]] && circleci-agent step halt) || exit 0"
+          command: '([[ -d node_modules ]] && circleci-agent step halt) || exit 0'
       - run: yarn install --frozen-lockfile
       - save_cache:
           key: node-cache-{{ checksum "yarn.lock" }}-{{ checksum ".circleci/config.yml" }}
           paths:
-            - "node_modules"
+            - 'node_modules'
 
   lint:
     <<: *node_env
@@ -54,7 +54,7 @@ jobs:
       - save_cache:
           key: build-cache-{{ .Revision }}
           paths:
-            - "dist"
+            - 'dist'
 
   deploy:
     <<: *node_env

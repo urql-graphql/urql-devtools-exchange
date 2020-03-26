@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 
 const {
   ReactCurrentOwner: CurrentOwner,
@@ -10,12 +10,12 @@ const isComponentFiber = (fiber: void | { tag: number }) =>
 
 // Is the component one of ours (just a heuristic to avoid circular dependencies or flags)
 const isInternalComponent = (Component: { name: string }) =>
-  Component.name === "Query" ||
-  Component.name === "Mutation" ||
-  Component.name === "Subscription";
+  Component.name === 'Query' ||
+  Component.name === 'Mutation' ||
+  Component.name === 'Subscription';
 
 export const getDisplayName = (): string => {
-  let source = "Component";
+  let source = 'Component';
 
   // Check whether the CurrentOwner is set
   const owner = CurrentOwner.current;
@@ -28,7 +28,7 @@ export const getDisplayName = (): string => {
     }
 
     // Get the Component's name if it has one
-    if (typeof Component === "function") {
+    if (typeof Component === 'function') {
       source = Component.displayName || Component.name || source;
     }
   }
