@@ -1,11 +1,21 @@
 <div align="center">
   <img alt="logo" src="https://raw.githubusercontent.com/FormidableLabs/urql-devtools/master/src/assets/icon.svg?sanitize=true" />
   <h1>urql devtools exchange</h1>
-
-  <a href="https://spectrum.chat/urql">
-    <img alt="Spectrum badge" src="https://withspectrum.github.io/badge/badge.svg" />
+  <a href="https://app.circleci.com/pipelines/github/FormidableLabs/urql-devtools-exchange">
+    <img src="https://img.shields.io/circleci/build/github/FormidableLabs/urql-devtools-exchange" alt="build" />
   </a>
-
+  <a href="https://npmjs.com/package/@urql/devtools">
+    <img src="https://img.shields.io/npm/v/@urql/devtools" alt="version" />
+  </a>
+  <a href="https://bundlephobia.com/result?p=@urql/devtools">
+    <img src="https://img.shields.io/bundlephobia/minzip/@urql/devtools" alt="size" />
+  </a>
+  <a href="https://codecov.io/gh/formidablelabs/urql-devtools-exchange">
+    <img src="https://img.shields.io/codecov/c/github/FormidableLabs/urql-devtools-exchange" alt="coverage">
+  </a>
+  <a href="https://github.com/formidablelabs/urql-devtools-exchange/blob/master/LICENSE">
+    <img src="https://img.shields.io/npm/l/@urql/devtools" alt="licence">
+  </a>
   <br />
   <br />
 </div>
