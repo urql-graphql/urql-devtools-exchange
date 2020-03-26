@@ -44,8 +44,8 @@ const client = createClient({
     process.env.NODE_ENV !== "production"
       ? devtoolsExchange
       : ({ forward }) => forward,
-    ...defaultExchanges
-  ]
+    ...defaultExchanges,
+  ],
 });
 ```
 

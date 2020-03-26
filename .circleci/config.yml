@@ -1,53 +1,55 @@
+version: 2
+
+.node_env: &node_env
+  docker:
+    - image: node:13
+
+.node_modules_cache: &node_modules_cache
+  restore_cache:
+    keys:
+      - node-cache-{{ checksum "yarn.lock" }}-{{ checksum ".circleci/config.yml" }}
+
 jobs:
   install:
-    docker:
-      - image: node:12
+    <<: *node_env
     steps:
       - checkout
-      - run: yarn
+      - *node_modules_cache
+      - run:
+          name: Check for dependencies
+          command: "([[ -d node_modules ]] && circleci-agent step halt) || exit 0"
+      - run: yarn install --frozen-lockfile
       - save_cache:
-          key: node-cache-{{ .Revision }}
+          key: node-cache-{{ checksum "yarn.lock" }}-{{ checksum ".circleci/config.yml" }}
           paths:
             - "node_modules"
 
   lint:
-    docker:
-      - image: node:12
+    <<: *node_env
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - node-cache-{{ .Revision }}
+      - *node_modules_cache
       - run: yarn run lint
 
   prettier:
-    docker:
-      - image: node:12
+    <<: *node_env
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - node-cache-{{ .Revision }}
+      - *node_modules_cache
       - run: yarn run prettier-check
 
   test:
-    docker:
-      - image: node:12
+    <<: *node_env
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - node-cache-{{ .Revision }}
+      - *node_modules_cache
       - run: yarn test
 
   build:
-    docker:
-      - image: node:12
+    <<: *node_env
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - node-cache-{{ .Revision }}
+      - *node_modules_cache
       - run: yarn run build
       - save_cache:
           key: build-cache-{{ .Revision }}
@@ -55,13 +57,10 @@ jobs:
             - "dist"
 
   deploy:
-    docker:
-      - image: node:12
+    <<: *node_env
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - build-cache-{{ .Revision }}
+      - *node_modules_cache
       - run:
           command: |
             node -e "process.env.CIRCLE_TAG === \`v\${require('./package.json').version}\` ? process.exit(0) : (console.error('Tag version does not line up with version in package.json') || process.exit(1))"

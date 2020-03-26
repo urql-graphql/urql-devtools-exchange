@@ -7,18 +7,18 @@ const client = {
     operationName,
     ...data,
     context: {
-      meta
-    }
+      meta,
+    },
   })),
-  executeRequestOperation: jest.fn(operation => ({
+  executeRequestOperation: jest.fn((operation) => ({
     operation,
-    data: { stubData: "here" }
-  }))
+    data: { stubData: "here" },
+  })),
 } as any;
-const forward = jest.fn().mockImplementation(o =>
-  map(operation => ({
+const forward = jest.fn().mockImplementation((o) =>
+  map((operation) => ({
     operation,
-    data: { stubData: "here" }
+    data: { stubData: "here" },
   }))(o)
 ) as any;
 const addEventListener = jest.spyOn(window, "addEventListener");
@@ -30,10 +30,10 @@ jest.spyOn(Date, "now").mockReturnValue(1234);
 beforeEach(jest.clearAllMocks);
 
 describe("on mount", () => {
-  const [ops$] = makeSubject<any>();
+  const { source } = makeSubject<any>();
 
   beforeEach(() => {
-    pipe(ops$, devtoolsExchange({ client, forward }), publish);
+    pipe(source, devtoolsExchange({ client, forward }), publish);
   });
 
   describe("window", () => {
@@ -54,18 +54,18 @@ describe("on mount", () => {
       expect(window.dispatchEvent).toBeCalledWith({
         type: "urql-devtools-exchange",
         detail: {
-          type: "init"
-        }
+          type: "init",
+        },
       });
     });
   });
 });
 
 describe("on event", () => {
-  const [sub, next] = makeSubject<any>();
+  const { source, next } = makeSubject<any>();
 
   beforeEach(() => {
-    pipe(sub, devtoolsExchange({ client, forward }), publish);
+    pipe(source, devtoolsExchange({ client, forward }), publish);
   });
 
   describe("on operation", () => {
@@ -74,9 +74,9 @@ describe("on event", () => {
       query: "query",
       variables: { someVar: "1234" },
       context: {
-        meta: {}
+        meta: {},
       },
-      operationName: "query"
+      operationName: "query",
     };
     beforeEach(() => {
       next(op);
@@ -96,9 +96,9 @@ describe("on event", () => {
       query: "query",
       variables: { someVar: "1234" },
       context: {
-        meta: {}
+        meta: {},
       },
-      operationName: "query"
+      operationName: "query",
     };
     beforeEach(() => {
       next(op);
@@ -116,7 +116,7 @@ describe("on event", () => {
 // Execute request from devtools
 describe("on request message", () => {
   let handler: any;
-  const [sub] = makeSubject<any>();
+  const { source } = makeSubject<any>();
   const requestMessage = {
     detail: {
       type: "request",
@@ -124,12 +124,12 @@ describe("on request message", () => {
         todos {
           id
         }
-      }`
-    }
+      }`,
+    },
   };
 
   beforeEach(() => {
-    pipe(sub, devtoolsExchange({ client, forward }), publish);
+    pipe(source, devtoolsExchange({ client, forward }), publish);
     handler = addEventListener.mock.calls[0][1];
   });
 
