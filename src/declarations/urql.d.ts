@@ -1,4 +1,4 @@
-import { OperationDebugMeta } from "urql";
+import { OperationDebugMeta } from "@urql/core";
 
 declare module "urql" {
   export interface OperationDebugMeta {

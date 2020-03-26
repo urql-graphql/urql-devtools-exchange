@@ -33,7 +33,7 @@ Add the devtools exchange to your urql client
 
 ```tsx
 // ...
-import { defaultExchanges, createClient } from "urql";
+import { defaultExchanges, createClient } from "@urql/core";
 import { devtoolsExchange } from "@urql/devtools";
 
 // ...
