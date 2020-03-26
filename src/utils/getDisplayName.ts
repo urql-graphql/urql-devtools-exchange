@@ -1,7 +1,7 @@
 import * as React from "react";
 
 const {
-  ReactCurrentOwner: CurrentOwner
+  ReactCurrentOwner: CurrentOwner,
 } = (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
 
 // Is the Fiber a FunctionComponent, ClassComponent, or IndeterminateComponent
