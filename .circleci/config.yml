@@ -57,10 +57,12 @@ jobs:
             - 'dist'
 
   deploy:
-    <<: *node_env
+    <<: *node_envSO 
     steps:
       - checkout
-      - *node_modules_cache
+      - restore_cache:
+          keys:
+            - build-cache-{{ .Revision }}
       - run:
           command: |
             node -e "process.env.CIRCLE_TAG === \`v\${require('./package.json').version}\` ? process.exit(0) : (console.error('Tag version does not line up with version in package.json') || process.exit(1))"
