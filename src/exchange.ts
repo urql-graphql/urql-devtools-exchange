@@ -52,14 +52,14 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
 /** Handle outgoing operations */
 const handleOperation = (operation: Operation) => {
   if (operation.operationName === 'teardown') {
-    return sendDebugToContentScript({
+    return sendDevtoolsDebug({
       type: 'teardown',
       message: 'The operation has been torn down',
       operation,
     });
   }
 
-  return sendDebugToContentScript({
+  return sendDevtoolsDebug({
     type: 'execution',
     message: 'The client has recieved an execute command.',
     operation,
@@ -72,7 +72,7 @@ const handleOperation = (operation: Operation) => {
 /** Handle new value or error */
 const handleResult = ({ operation, data, error }: OperationResult) => {
   if (error) {
-    return sendDebugToContentScript({
+    return sendDevtoolsDebug({
       type: 'error',
       message: 'The operation has returned a new error.',
       operation,
@@ -82,7 +82,7 @@ const handleResult = ({ operation, data, error }: OperationResult) => {
     });
   }
 
-  return sendDebugToContentScript({
+  return sendDevtoolsDebug({
     type: 'update',
     message: 'The operation has returned a new response.',
     operation,
@@ -97,13 +97,14 @@ const sendToContentScript = (detail: DevtoolsExchangeOutgoingMessage) =>
     new CustomEvent(DevtoolsExchangeOutgoingEventType, { detail })
   );
 
-const sendDebugToContentScript = <T extends string>(debug: DebugEventArg<T>) =>
+const sendDevtoolsDebug = <T extends string>(debug: DebugEventArg<T>) =>
   sendToContentScript({
     type: 'debug',
     data: JSON.parse(
       JSON.stringify({
         ...debug,
         source: 'devtoolsExchange',
+        timestamp: Date.now(),
       })
     ),
   });
