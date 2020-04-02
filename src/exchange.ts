@@ -94,19 +94,19 @@ const handleResult = ({ operation, data, error }: OperationResult) => {
 
 const sendToContentScript = (detail: DevtoolsExchangeOutgoingMessage) =>
   window.dispatchEvent(
-    new CustomEvent(DevtoolsExchangeOutgoingEventType, { detail })
+    new CustomEvent(DevtoolsExchangeOutgoingEventType, {
+      detail: JSON.parse(JSON.stringify(detail)),
+    })
   );
 
 const sendDevtoolsDebug = <T extends string>(debug: DebugEventArg<T>) =>
   sendToContentScript({
     type: 'debug',
-    data: JSON.parse(
-      JSON.stringify({
-        ...debug,
-        source: 'devtoolsExchange',
-        timestamp: Date.now(),
-      })
-    ),
+    data: {
+      ...debug,
+      source: 'devtoolsExchange',
+      timestamp: Date.now(),
+    },
   });
 
 /** Handles execute request messages. */
