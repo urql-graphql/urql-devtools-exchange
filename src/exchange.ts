@@ -13,8 +13,7 @@ import {
   DevtoolsExchangeIncomingEventType,
   DevtoolsExchangeIncomingMessage,
 } from './types';
-import { getDisplayName } from './utils';
-import { hash } from './utils/hash';
+import { getDisplayName, hash } from './utils';
 import { parse } from 'graphql';
 
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
