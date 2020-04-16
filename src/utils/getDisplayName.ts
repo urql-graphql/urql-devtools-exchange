@@ -1,8 +1,6 @@
 import * as React from 'react';
 
-const {
-  ReactCurrentOwner: CurrentOwner,
-} = (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+const CurrentOwner = (React as any)?.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED?.ReactCurrentOwner;
 
 // Is the Fiber a FunctionComponent, ClassComponent, or IndeterminateComponent
 const isComponentFiber = (fiber: void | { tag: number }) =>
@@ -18,8 +16,9 @@ export const getDisplayName = (): string => {
   let source = 'Component';
 
   // Check whether the CurrentOwner is set
-  const owner = CurrentOwner.current;
-  if (owner !== null && isComponentFiber(owner)) {
+  const owner = CurrentOwner?.current;
+
+  if (owner && isComponentFiber(owner)) {
     let Component = owner.type;
 
     // If this is one of our own components then check the parent
