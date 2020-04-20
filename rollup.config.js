@@ -81,9 +81,6 @@ const makePlugins = (isProduction = false) => [
   commonjs({
     ignoreGlobal: true,
     include: /\/node_modules\//,
-    namedExports: {
-      react: Object.keys(require('react')),
-    },
   }),
   typescript({
     typescript: require('typescript'),
@@ -120,14 +117,6 @@ const makePlugins = (isProduction = false) => [
     plugins: [
       ['babel-plugin-closure-elimination', {}],
       ['@babel/plugin-transform-object-assign', {}],
-      [
-        '@babel/plugin-transform-react-jsx',
-        {
-          pragma: 'React.createElement',
-          pragmaFrag: 'React.Fragment',
-          useBuiltIns: true,
-        },
-      ],
       [
         'babel-plugin-transform-async-to-promises',
         {

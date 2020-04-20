@@ -129,7 +129,7 @@ describe('on operation', () => {
             "detail": Object {
               "data": Object {
                 "data": Object {
-                  "sourceComponent": "Component",
+                  "sourceComponent": "Unknown",
                 },
                 "message": "The client has recieved an execute command.",
                 "operation": Object {

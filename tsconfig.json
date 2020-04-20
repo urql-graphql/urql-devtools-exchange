@@ -5,7 +5,6 @@
     "baseUrl": ".",
     "outDir": "dist/cjs",
     "lib": ["dom", "esnext"],
-    "jsx": "react",
     "module": "es2015",
     "moduleResolution": "node",
     "target": "esnext",

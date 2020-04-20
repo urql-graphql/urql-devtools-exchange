@@ -51,10 +51,8 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/plugin-transform-object-assign": "^7.8.3",
-    "@babel/plugin-transform-react-jsx": "^7.9.4",
     "@types/jest": "^25.1.4",
     "@types/node": "^12.12.31",
-    "@types/react": "^16.9.25",
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
     "@urql/core": "1.11.0-debug.0",
@@ -63,15 +61,12 @@
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-react": "^7.19.0",
-    "eslint-plugin-react-hooks": "^2.5.1",
     "graphql": "^14.6.0",
     "husky": "^4.2.3",
     "jest": "^25.2.1",
     "lint-staged": "^10.0.9",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.2",
-    "react": "^16.9.0",
     "rimraf": "^3.0.2",
     "rollup": "^2.2.0",
     "rollup-plugin-babel": "^4.4.0",
@@ -88,7 +83,6 @@
   },
   "peerDependencies": {
     "@urql/core": ">= 1.11.0-debug.0",
-    "react": ">= 16.8.0",
     "wonka": "^4.0.9"
   }
 }
