@@ -1,13 +1,11 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "rootDir": "./src",
-    "baseUrl": ".",
     "outDir": "dist/cjs",
     "lib": ["dom", "esnext"],
-    "module": "es2015",
+    "module": "esnext",
     "moduleResolution": "node",
-    "target": "esnext",
+    "target": "ES6",
     "strict": true,
     "noImplicitAny": false,
     "noUnusedParameters": true,
