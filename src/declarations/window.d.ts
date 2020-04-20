@@ -1,5 +1,5 @@
 interface Window {
-  __urql__?: {
-    url: string;
+  __urql_devtools__?: {
+    version: string;
   };
 }

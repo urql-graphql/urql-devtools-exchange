@@ -1,5 +1,6 @@
 import { basename } from 'path';
 import { DEFAULT_EXTENSIONS } from '@babel/core';
+import json from '@rollup/plugin-json';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
@@ -100,6 +101,7 @@ const makePlugins = (isProduction = false) => [
       },
     },
   }),
+  json(),
   buble({
     transforms: {
       unicodeRegExp: false,
@@ -107,7 +109,7 @@ const makePlugins = (isProduction = false) => [
       dangerousTaggedTemplateString: true,
     },
     objectAssign: 'Object.assign',
-    exclude: 'node_modules/**',
+    exclude: ['node_modules/**'],
   }),
   babel({
     babelrc: false,
@@ -144,17 +146,13 @@ export default [
     output: [
       {
         sourcemap: true,
-        legacy: true,
         freeze: false,
-        esModule: false,
         file: `./dist/${name}.js`,
         format: 'cjs',
       },
       {
         sourcemap: true,
-        legacy: true,
         freeze: false,
-        esModule: false,
         file: `./dist/${name}.es.js`,
         format: 'esm',
       },
@@ -166,14 +164,12 @@ export default [
     output: [
       {
         sourcemap: true,
-        legacy: true,
         freeze: false,
         file: `./dist/${name}.min.js`,
         format: 'cjs',
       },
       {
         sourcemap: true,
-        legacy: true,
         freeze: false,
         file: `./dist/${name}.es.min.js`,
         format: 'esm',

@@ -1,5 +1,6 @@
-import { devtoolsExchange } from './exchange';
 import { makeSubject, pipe, publish, map } from 'wonka';
+import { devtoolsExchange } from './exchange';
+import { version } from '../package.json';
 
 const Target = () => {
   let eventListeners: any[] = [];
@@ -58,8 +59,8 @@ describe('on mount', () => {
   });
 
   describe('window', () => {
-    it('has __urql__ property', () => {
-      expect(window).toHaveProperty('__urql__', { url: client.url });
+    it('has __urql_devtools__ property', () => {
+      expect(window).toHaveProperty('__urql_devtools__', { version });
     });
   });
 
