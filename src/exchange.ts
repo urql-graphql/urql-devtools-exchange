@@ -22,11 +22,6 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
     return (ops$) => pipe(ops$, forward);
   }
 
-  // Expose graphql url for introspection
-  window.__urql__ = {
-    url: client.url,
-  };
-
   // Listen for messages from content script
   window.addEventListener(DevtoolsExchangeIncomingEventType, (event) => {
     const e = event as CustomEvent<DevtoolsExchangeIncomingMessage>;
