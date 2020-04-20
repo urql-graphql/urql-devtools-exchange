@@ -2,6 +2,7 @@ import { DebugEvent } from '@urql/core';
 
 export interface InitMessage {
   type: 'init';
+  version?: string;
 }
 
 export interface DisconnectMessage {

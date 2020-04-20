@@ -12,7 +12,8 @@
     "noImplicitAny": false,
     "noUnusedParameters": true,
     "sourceMap": true,
-    "pretty": true
+    "pretty": true,
+    "resolveJsonModule": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

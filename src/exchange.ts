@@ -15,12 +15,22 @@ import {
 } from './types';
 import { getDisplayName, hash } from './utils';
 import { parse } from 'graphql';
+/* eslint-disable-next-line */
+// @ts-ignore
+import { version } from '../package.json';
 
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
-  // Disable in prod and SSR
-  if (process.env.NODE_ENV === 'production' || typeof window === 'undefined') {
+  if (
+    typeof window === 'undefined' ||
+    process?.env?.NODE_ENV === 'production'
+  ) {
     return (ops$) => pipe(ops$, forward);
   }
+
+  /* eslint-disable-next-line @typescript-eslint/camelcase */
+  window.__urql_devtools__ = {
+    version,
+  };
 
   // Listen for messages from content script
   window.addEventListener(DevtoolsExchangeIncomingEventType, (event) => {
@@ -28,6 +38,7 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
     const handler = messageHandlers[e.detail.type];
     handler && handler(client)(e.detail);
   });
+  sendToContentScript({ type: 'init', version });
 
   // Tell the content script we are present
   sendToContentScript({ type: 'init' });
