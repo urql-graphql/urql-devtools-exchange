@@ -146,17 +146,13 @@ export default [
     output: [
       {
         sourcemap: true,
-        legacy: true,
         freeze: false,
-        esModule: false,
         file: `./dist/${name}.js`,
         format: 'cjs',
       },
       {
         sourcemap: true,
-        legacy: true,
         freeze: false,
-        esModule: false,
         file: `./dist/${name}.es.js`,
         format: 'esm',
       },
@@ -168,14 +164,12 @@ export default [
     output: [
       {
         sourcemap: true,
-        legacy: true,
         freeze: false,
         file: `./dist/${name}.min.js`,
         format: 'cjs',
       },
       {
         sourcemap: true,
-        legacy: true,
         freeze: false,
         file: `./dist/${name}.es.min.js`,
         format: 'esm',
