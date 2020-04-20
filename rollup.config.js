@@ -109,7 +109,7 @@ const makePlugins = (isProduction = false) => [
       dangerousTaggedTemplateString: true,
     },
     objectAssign: 'Object.assign',
-    exclude: ['node_modules/**', 'package.json'],
+    exclude: ['node_modules/**'],
   }),
   babel({
     babelrc: false,
