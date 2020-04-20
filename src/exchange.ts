@@ -38,7 +38,6 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
     const handler = messageHandlers[e.detail.type];
     handler && handler(client)(e.detail);
   });
-  sendToContentScript({ type: 'init', version });
 
   // Tell the content script we are present
   sendToContentScript({ type: 'init' });
