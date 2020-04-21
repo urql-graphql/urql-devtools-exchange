@@ -16,6 +16,7 @@
 **Merged pull requests:**
 
 - Add versioning [\#31](https://github.com/FormidableLabs/urql-devtools-exchange/pull/31) ([andyrichardson](https://github.com/andyrichardson))
+- V1 Readme [\#29](https://github.com/FormidableLabs/urql-devtools-exchange/pull/29) ([andyrichardson](https://github.com/andyrichardson))
 - Remove react dependency [\#28](https://github.com/FormidableLabs/urql-devtools-exchange/pull/28) ([andyrichardson](https://github.com/andyrichardson))
 - Create ci.json [\#27](https://github.com/FormidableLabs/urql-devtools-exchange/pull/27) ([andyrichardson](https://github.com/andyrichardson))
 - Migrate to debug messages [\#26](https://github.com/FormidableLabs/urql-devtools-exchange/pull/26) ([andyrichardson](https://github.com/andyrichardson))
