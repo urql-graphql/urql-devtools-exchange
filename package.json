@@ -1,7 +1,7 @@
 {
   "name": "@urql/devtools",
-  "version": "1.0.0-dev.1",
-  "description": "The exchange for use with Urql Devtools",
+  "version": "1.0.0",
+  "description": "The official exchange for use with Urql Devtools",
   "main": "dist/urql-devtools-exchange.js",
   "module": "dist/urql-devtools-exchange.es.js",
   "types": "dist/types/index.d.ts",
