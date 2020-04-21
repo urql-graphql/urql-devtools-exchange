@@ -16,7 +16,6 @@
   </a>
 </div>
 
-
 ## About
 
 A first-party exchange for [Urql](https://github.com/FormidableLabs/urql) which interfaces with the [Urql Devtools](https://github.com/FormidableLabs/urql-devtools) browser extension.
@@ -37,10 +36,10 @@ Add the exchange to your Urql client
 
 ```js
 import { createClient, defaultExchanges } from 'urql';
-import { devtoolsExchange } from "@urql/devtools";
+import { devtoolsExchange } from '@urql/devtools';
 
 const client = createClient({
-  url: "http://localhost:3001/graphql",
+  url: 'http://localhost:3001/graphql',
   exchanges: [devtoolsExchange, ...defaultExchanges],
 });
 ```
