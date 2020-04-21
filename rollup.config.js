@@ -1,5 +1,6 @@
 import { basename } from 'path';
 import { DEFAULT_EXTENSIONS } from '@babel/core';
+import replace from '@rollup/plugin-replace';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
@@ -81,28 +82,19 @@ const makePlugins = (isProduction = false) => [
   commonjs({
     ignoreGlobal: true,
     include: /\/node_modules\//,
-    namedExports: {
-      react: Object.keys(require('react')),
-    },
   }),
   typescript({
     typescript: require('typescript'),
     cacheRoot: './node_modules/.cache/.rts2_cache',
     useTsconfigDeclarationDir: true,
-    tsconfigDefaults: {
-      compilerOptions: {
-        sourceMap: true,
-      },
-    },
     tsconfigOverride: {
       exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/test-utils/*'],
       compilerOptions: {
-        declaration: !isProduction,
-        declarationDir: './dist/types/',
         target: 'es6',
       },
     },
   }),
+  replace({ __pkg_version__: `"${pkgInfo.version}"` }),
   buble({
     transforms: {
       unicodeRegExp: false,
@@ -110,7 +102,7 @@ const makePlugins = (isProduction = false) => [
       dangerousTaggedTemplateString: true,
     },
     objectAssign: 'Object.assign',
-    exclude: 'node_modules/**',
+    exclude: ['node_modules/**'],
   }),
   babel({
     babelrc: false,
@@ -120,14 +112,6 @@ const makePlugins = (isProduction = false) => [
     plugins: [
       ['babel-plugin-closure-elimination', {}],
       ['@babel/plugin-transform-object-assign', {}],
-      [
-        '@babel/plugin-transform-react-jsx',
-        {
-          pragma: 'React.createElement',
-          pragmaFrag: 'React.Fragment',
-          useBuiltIns: true,
-        },
-      ],
       [
         'babel-plugin-transform-async-to-promises',
         {
@@ -155,17 +139,13 @@ export default [
     output: [
       {
         sourcemap: true,
-        legacy: true,
         freeze: false,
-        esModule: false,
         file: `./dist/${name}.js`,
         format: 'cjs',
       },
       {
         sourcemap: true,
-        legacy: true,
         freeze: false,
-        esModule: false,
         file: `./dist/${name}.es.js`,
         format: 'esm',
       },
@@ -177,14 +157,12 @@ export default [
     output: [
       {
         sourcemap: true,
-        legacy: true,
         freeze: false,
         file: `./dist/${name}.min.js`,
         format: 'cjs',
       },
       {
         sourcemap: true,
-        legacy: true,
         freeze: false,
         file: `./dist/${name}.es.min.js`,
         format: 'esm',

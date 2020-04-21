@@ -1,10 +1,10 @@
-import { map, pipe, tap, toPromise, take, filter, merge, share } from 'wonka';
+import { pipe, tap, take, toPromise } from 'wonka';
 import {
   Exchange,
   Client,
   Operation,
   OperationResult,
-  OperationDebugMeta,
+  DebugEventArg,
 } from '@urql/core';
 import {
   DevtoolsExchangeOutgoingMessage,
@@ -13,18 +13,21 @@ import {
   DevtoolsExchangeIncomingEventType,
   DevtoolsExchangeIncomingMessage,
 } from './types';
-import { getDisplayName } from './utils';
-import { hash } from './utils/hash';
+import { getDisplayName, hash } from './utils';
 import { parse } from 'graphql';
 
+declare const __pkg_version__: string;
+
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
-  if (typeof window === 'undefined') {
+  if (
+    typeof window === 'undefined' ||
+    process?.env?.NODE_ENV === 'production'
+  ) {
     return (ops$) => pipe(ops$, forward);
   }
 
-  // Expose graphql url for introspection
-  window.__urql__ = {
-    url: client.url,
+  window.__urql_devtools__ = {
+    version: __pkg_version__,
   };
 
   // Listen for messages from content script
@@ -33,67 +36,81 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
     const handler = messageHandlers[e.detail.type];
     handler && handler(client)(e.detail);
   });
+
+  // Tell the content script we are present
   sendToContentScript({ type: 'init' });
 
-  return (ops$) => {
-    const sharedOps$ = pipe(ops$, map(addOperationContext), share);
-
-    const isDevtoolsOp = (o: Operation) =>
-      Boolean(o.context.meta && o.context.meta.source === 'Devtools');
-
-    const appOps$ = pipe(
-      sharedOps$,
-      filter((o) => !isDevtoolsOp(o)),
-      tap(handleOperation),
-      forward,
-      map(addOperationResponseContext),
-      tap(handleOperation)
+  // Forward debug events to content script
+  client.subscribeToDebugTarget &&
+    client.subscribeToDebugTarget((event) =>
+      sendToContentScript({
+        type: 'debug',
+        data: event,
+      })
     );
 
-    const devtoolsOps$ = pipe(
-      sharedOps$,
-      filter((o) => isDevtoolsOp(o)),
-      forward
-    );
-
-    return merge([appOps$, devtoolsOps$]);
-  };
+  return (ops$) => pipe(ops$, tap(handleOperation), forward, tap(handleResult));
 };
 
-const addOperationResponseContext = (op: OperationResult): OperationResult => ({
-  ...op,
-  operation: {
-    ...op.operation,
-    context: {
-      ...op.operation.context,
-      meta: {
-        ...op.operation.context.meta,
-        networkLatency:
-          Date.now() -
-          ((op.operation.context.meta as OperationDebugMeta)
-            .startTime as number),
+/** Handle outgoing operations */
+const handleOperation = (operation: Operation) => {
+  if (operation.operationName === 'teardown') {
+    return sendDevtoolsDebug({
+      type: 'teardown',
+      message: 'The operation has been torn down',
+      operation,
+    });
+  }
+
+  return sendDevtoolsDebug({
+    type: 'execution',
+    message: 'The client has recieved an execute command.',
+    operation,
+    data: {
+      sourceComponent: getDisplayName(),
+    },
+  });
+};
+
+/** Handle new value or error */
+const handleResult = ({ operation, data, error }: OperationResult) => {
+  if (error) {
+    return sendDevtoolsDebug({
+      type: 'error',
+      message: 'The operation has returned a new error.',
+      operation,
+      data: {
+        value: error,
       },
-    },
-  },
-});
+    });
+  }
 
-const addOperationContext = (op: Operation): Operation => ({
-  ...op,
-  context: {
-    ...op.context,
-    meta: {
-      ...op.context.meta,
-      source: (op.context.meta && op.context.meta.source) || getDisplayName(),
-      startTime: Date.now(),
+  return sendDevtoolsDebug({
+    type: 'update',
+    message: 'The operation has returned a new response.',
+    operation,
+    data: {
+      value: data,
     },
-  },
-});
-
-/** Handle operation or response from stream. */
-const handleOperation = <T extends Operation | OperationResult>(op: T) => {
-  const event = JSON.parse(JSON.stringify(parseStreamData(op))); // Serialization required for some events (such as error)
-  sendToContentScript(event);
+  });
 };
+
+const sendToContentScript = (detail: DevtoolsExchangeOutgoingMessage) =>
+  window.dispatchEvent(
+    new CustomEvent(DevtoolsExchangeOutgoingEventType, {
+      detail: JSON.parse(JSON.stringify(detail)),
+    })
+  );
+
+const sendDevtoolsDebug = <T extends string>(debug: DebugEventArg<T>) =>
+  sendToContentScript({
+    type: 'debug',
+    data: {
+      ...debug,
+      source: 'devtoolsExchange',
+      timestamp: Date.now(),
+    },
+  });
 
 /** Handles execute request messages. */
 const requestHandler = (client: Client) => (message: ExecuteRequestMessage) => {
@@ -112,47 +129,10 @@ const requestHandler = (client: Client) => (message: ExecuteRequestMessage) => {
     }
   );
 
-  handleOperation(op);
-  pipe(
-    client.executeRequestOperation(op),
-    tap(handleOperation),
-    take(1),
-    toPromise
-  );
+  pipe(client.executeRequestOperation(op), take(1), toPromise);
 };
 
 /** Map of handlers for incoming messages. */
 const messageHandlers = {
   request: requestHandler,
 } as const;
-
-/** Creates a DevtoolsExchangeOutgoingMessage from operations/responses. */
-const parseStreamData = <T extends Operation | OperationResult>(op: T) => {
-  const timestamp = Date.now();
-
-  // Outgoing operation
-  if ('operationName' in op) {
-    return {
-      type: 'operation',
-      data: op,
-      timestamp,
-    } as const;
-  }
-
-  // Incoming error
-  if ((op as OperationResult).error !== undefined) {
-    return { type: 'error', data: op, timestamp } as const;
-  }
-
-  // Incoming response
-  return {
-    type: 'response',
-    data: op,
-    timestamp,
-  } as const;
-};
-
-const sendToContentScript = (detail: DevtoolsExchangeOutgoingMessage) =>
-  window.dispatchEvent(
-    new CustomEvent(DevtoolsExchangeOutgoingEventType, { detail })
-  );
