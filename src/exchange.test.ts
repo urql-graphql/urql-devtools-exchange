@@ -1,19 +1,6 @@
 import { makeSubject, pipe, publish, map } from 'wonka';
 import { devtoolsExchange } from './exchange';
 import { version } from '../package.json';
-
-const Target = () => {
-  let eventListeners: any[] = [];
-
-  const addEventListener = (fn) => (eventListeners = [...eventListeners, fn]);
-  const dispatchEvent = (e) => eventListeners.forEach((f) => f(e));
-
-  return {
-    addEventListener,
-    dispatchEvent,
-  };
-};
-
 let client: any;
 
 let forward: any;
@@ -32,7 +19,7 @@ beforeEach(() => {
       operation,
       data: { stubData: 'here' },
     })),
-    debugTarget: Target(),
+    subscribeToDebugTarget: jest.fn(),
   };
 
   forward = jest.fn().mockImplementation((o) =>
@@ -95,7 +82,8 @@ describe('on debug message', () => {
     };
 
     devtoolsExchange({ client, forward, dispatchDebug });
-    client.debugTarget.dispatchEvent(event);
+    const subscriber = client.subscribeToDebugTarget.mock.calls[0][0];
+    subscriber(event);
 
     expect(window.dispatchEvent).toBeCalledTimes(2);
     expect(window.dispatchEvent).toBeCalledWith({

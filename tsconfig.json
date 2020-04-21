@@ -3,6 +3,8 @@
     "esModuleInterop": true,
     "outDir": "dist/cjs",
     "lib": ["dom", "esnext"],
+    "rootDir": "./src",
+    "baseUrl": ".",
     "module": "esnext",
     "moduleResolution": "node",
     "target": "ES6",

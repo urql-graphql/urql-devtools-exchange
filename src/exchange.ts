@@ -43,12 +43,13 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
   sendToContentScript({ type: 'init' });
 
   // Forward debug events to content script
-  client.debugTarget!.addEventListener((event) =>
-    sendToContentScript({
-      type: 'debug',
-      data: event,
-    })
-  );
+  client.subscribeToDebugTarget &&
+    client.subscribeToDebugTarget((event) =>
+      sendToContentScript({
+        type: 'debug',
+        data: event,
+      })
+    );
 
   return (ops$) => pipe(ops$, tap(handleOperation), forward, tap(handleResult));
 };
