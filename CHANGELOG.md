@@ -1,5 +1,27 @@
 # Changelog
 
+## [v1.0.0](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v1.0.0) (2020-04-21)
+
+[Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v0.1.2...v1.0.0)
+
+**Implemented enhancements:**
+
+- Migrate to @urql/core [\#21](https://github.com/FormidableLabs/urql-devtools-exchange/issues/21)
+- Add support for debug events [\#20](https://github.com/FormidableLabs/urql-devtools-exchange/issues/20)
+
+**Fixed bugs:**
+
+- Remove React dependency [\#25](https://github.com/FormidableLabs/urql-devtools-exchange/issues/25)
+
+**Merged pull requests:**
+
+- Add versioning [\#31](https://github.com/FormidableLabs/urql-devtools-exchange/pull/31) ([andyrichardson](https://github.com/andyrichardson))
+- Remove react dependency [\#28](https://github.com/FormidableLabs/urql-devtools-exchange/pull/28) ([andyrichardson](https://github.com/andyrichardson))
+- Create ci.json [\#27](https://github.com/FormidableLabs/urql-devtools-exchange/pull/27) ([andyrichardson](https://github.com/andyrichardson))
+- Migrate to debug messages [\#26](https://github.com/FormidableLabs/urql-devtools-exchange/pull/26) ([andyrichardson](https://github.com/andyrichardson))
+- Update dependences [\#23](https://github.com/FormidableLabs/urql-devtools-exchange/pull/23) ([andyrichardson](https://github.com/andyrichardson))
+- Migrate to @urql/core [\#22](https://github.com/FormidableLabs/urql-devtools-exchange/pull/22) ([andyrichardson](https://github.com/andyrichardson))
+
 ## [v0.1.2](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v0.1.2) (2019-12-13)
 
 [Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v0.1.1...v0.1.2)
