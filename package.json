@@ -84,6 +84,7 @@
   },
   "peerDependencies": {
     "@urql/core": ">= 1.11.0",
+    "graphql": ">= 0.11.0",
     "wonka": ">= 4.0.9"
   }
 }
