@@ -1,4 +1,4 @@
-import { pipe, tap, take, publish, toPromise } from 'wonka';
+import { pipe, tap, take, toPromise } from 'wonka';
 import {
   Exchange,
   Client,
@@ -15,9 +15,8 @@ import {
 } from './types';
 import { getDisplayName, hash } from './utils';
 import { parse } from 'graphql';
-/* eslint-disable-next-line */
-// @ts-ignore
-import { version } from '../package.json';
+
+declare const __pkg_version__: string;
 
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
   if (
@@ -27,9 +26,8 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
     return (ops$) => pipe(ops$, forward);
   }
 
-  /* eslint-disable-next-line @typescript-eslint/camelcase */
   window.__urql_devtools__ = {
-    version,
+    version: __pkg_version__,
   };
 
   // Listen for messages from content script

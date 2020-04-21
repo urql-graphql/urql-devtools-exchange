@@ -1,8 +1,10 @@
 import { makeSubject, pipe, publish, map } from 'wonka';
 import { devtoolsExchange } from './exchange';
-import { version } from '../package.json';
-let client: any;
 
+const version = '200.0.0';
+(global as any).__pkg_version__ = version;
+
+let client: any;
 let forward: any;
 
 beforeEach(() => {
@@ -31,9 +33,7 @@ beforeEach(() => {
 });
 const addEventListener = jest.spyOn(window, 'addEventListener');
 const dispatchDebug = jest.fn();
-const dispatchEvent = jest
-  .spyOn(window, 'dispatchEvent')
-  .mockImplementation(() => false);
+jest.spyOn(window, 'dispatchEvent').mockImplementation(() => false);
 jest.spyOn(Date, 'now').mockReturnValue(1234);
 
 beforeEach(jest.clearAllMocks);

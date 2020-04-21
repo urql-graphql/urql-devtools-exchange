@@ -1,6 +1,6 @@
 import { basename } from 'path';
 import { DEFAULT_EXTENSIONS } from '@babel/core';
-import json from '@rollup/plugin-json';
+import replace from '@rollup/plugin-replace';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
@@ -87,21 +87,14 @@ const makePlugins = (isProduction = false) => [
     typescript: require('typescript'),
     cacheRoot: './node_modules/.cache/.rts2_cache',
     useTsconfigDeclarationDir: true,
-    tsconfigDefaults: {
-      compilerOptions: {
-        sourceMap: true,
-      },
-    },
     tsconfigOverride: {
       exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/test-utils/*'],
       compilerOptions: {
-        declaration: !isProduction,
-        declarationDir: './dist/types/',
         target: 'es6',
       },
     },
   }),
-  json(),
+  replace({ __pkg_version__: `"${pkgInfo.version}"` }),
   buble({
     transforms: {
       unicodeRegExp: false,

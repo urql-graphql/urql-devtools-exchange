@@ -15,6 +15,15 @@
     "prettier/@typescript-eslint"
   ],
   "rules": {
+    "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/naming-convention": [
+      "error",
+      { "selector": "default", "format": ["camelCase"], "filter": "/^__.*/" },
+      {
+        "selector": "typeLike",
+        "format": ["PascalCase"]
+      }
+    ],
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/member-ordering": "off",
     "@typescript-eslint/explicit-member-accessibility": "off",
