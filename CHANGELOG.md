@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.0.1](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v1.0.1) (2020-04-22)
+
+[Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v1.0.0...v1.0.1)
+
+**Fixed bugs:**
+
+- GraphQL.js is bundled with the build output [\#32](https://github.com/FormidableLabs/urql-devtools-exchange/issues/32)
+
+**Merged pull requests:**
+
+- Add GraphQL as peer dependency [\#33](https://github.com/FormidableLabs/urql-devtools-exchange/pull/33) ([andyrichardson](https://github.com/andyrichardson))
+
 ## [v1.0.0](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v1.0.0) (2020-04-21)
 
 [Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v0.1.2...v1.0.0)
