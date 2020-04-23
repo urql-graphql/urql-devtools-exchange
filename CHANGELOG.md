@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.0.2](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v1.0.2) (2020-04-23)
+
+[Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v1.0.1...v1.0.2)
+
+**Fixed bugs:**
+
+- Use postMessage for communication with content script [\#34](https://github.com/FormidableLabs/urql-devtools-exchange/issues/34)
+
+**Merged pull requests:**
+
+- Use window.postMessage [\#35](https://github.com/FormidableLabs/urql-devtools-exchange/pull/35) ([andyrichardson](https://github.com/andyrichardson))
+
 ## [v1.0.1](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v1.0.1) (2020-04-22)
 
 [Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v1.0.0...v1.0.1)
