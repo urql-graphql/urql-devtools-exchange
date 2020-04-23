@@ -32,8 +32,9 @@ beforeEach(() => {
   ) as any;
 });
 const addEventListener = jest.spyOn(window, 'addEventListener');
+const postMessage = jest.spyOn(window, 'postMessage');
 const dispatchDebug = jest.fn();
-jest.spyOn(window, 'dispatchEvent').mockImplementation(() => false);
+
 jest.spyOn(Date, 'now').mockReturnValue(1234);
 
 beforeEach(jest.clearAllMocks);
@@ -59,13 +60,16 @@ describe('on mount', () => {
 
   describe('init event', () => {
     it('is dispatched', () => {
-      expect(window.dispatchEvent).toBeCalledTimes(1);
-      expect(window.dispatchEvent).toBeCalledWith({
-        type: 'urql-devtools-exchange',
-        detail: {
-          type: 'init',
+      expect(postMessage).toBeCalledTimes(1);
+      expect(postMessage).toBeCalledWith(
+        {
+          type: 'urql-devtools-exchange',
+          message: {
+            type: 'init',
+          },
         },
-      });
+        window.location.origin
+      );
     });
   });
 });
@@ -85,14 +89,17 @@ describe('on debug message', () => {
     const subscriber = client.subscribeToDebugTarget.mock.calls[0][0];
     subscriber(event);
 
-    expect(window.dispatchEvent).toBeCalledTimes(2);
-    expect(window.dispatchEvent).toBeCalledWith({
-      type: 'urql-devtools-exchange',
-      detail: {
-        type: 'debug',
-        data: event,
+    expect(postMessage).toBeCalledTimes(2);
+    expect(postMessage).toBeCalledWith(
+      {
+        type: 'urql-devtools-exchange',
+        message: {
+          type: 'debug',
+          data: event,
+        },
       },
-    });
+      window.location.origin
+    );
   });
 });
 
@@ -111,11 +118,10 @@ describe('on operation', () => {
         publish
       );
       next(operation);
-      expect((window.dispatchEvent as any).mock.calls[1])
-        .toMatchInlineSnapshot(`
+      expect(postMessage.mock.calls[1]).toMatchInlineSnapshot(`
         Array [
           Object {
-            "detail": Object {
+            "message": Object {
               "data": Object {
                 "data": Object {
                   "sourceComponent": "Unknown",
@@ -132,6 +138,7 @@ describe('on operation', () => {
             },
             "type": "urql-devtools-exchange",
           },
+          "http://localhost",
         ]
       `);
     });
@@ -151,11 +158,10 @@ describe('on operation', () => {
         publish
       );
       next(operation);
-      expect((window.dispatchEvent as any).mock.calls[1])
-        .toMatchInlineSnapshot(`
+      expect(postMessage.mock.calls[1]).toMatchInlineSnapshot(`
         Array [
           Object {
-            "detail": Object {
+            "message": Object {
               "data": Object {
                 "message": "The operation has been torn down",
                 "operation": Object {
@@ -169,6 +175,7 @@ describe('on operation', () => {
             },
             "type": "urql-devtools-exchange",
           },
+          "http://localhost",
         ]
       `);
     });
@@ -225,11 +232,10 @@ describe('on operation response', () => {
       next(operation);
 
       // * call number two relates to the operation response
-      expect((window.dispatchEvent as any).mock.calls[2])
-        .toMatchInlineSnapshot(`
+      expect(postMessage.mock.calls[2]).toMatchInlineSnapshot(`
         Array [
           Object {
-            "detail": Object {
+            "message": Object {
               "data": Object {
                 "data": Object {
                   "value": Object {
@@ -248,6 +254,7 @@ describe('on operation response', () => {
             },
             "type": "urql-devtools-exchange",
           },
+          "http://localhost",
         ]
       `);
     });
@@ -274,11 +281,10 @@ describe('on operation response', () => {
       );
       next(operation);
       // * call number two relates to the operation response
-      expect((window.dispatchEvent as any).mock.calls[2])
-        .toMatchInlineSnapshot(`
+      expect(postMessage.mock.calls[2]).toMatchInlineSnapshot(`
         Array [
           Object {
-            "detail": Object {
+            "message": Object {
               "data": Object {
                 "data": Object {
                   "value": Object {
@@ -297,6 +303,7 @@ describe('on operation response', () => {
             },
             "type": "urql-devtools-exchange",
           },
+          "http://localhost",
         ]
       `);
     });
@@ -308,13 +315,17 @@ describe('on request message', () => {
   let handler: any;
   const { source } = makeSubject<any>();
   const requestMessage = {
-    detail: {
-      type: 'request',
-      query: `query {
-        todos {
-          id
-        }
-      }`,
+    isTrusted: true,
+    data: {
+      type: 'urql-devtools-exchange-in',
+      message: {
+        type: 'request',
+        query: `query {
+          todos {
+            id
+          }
+        }`,
+      },
     },
   };
 
@@ -336,7 +347,7 @@ describe('on request message', () => {
               },
             },
           },
-          "key": 487904461,
+          "key": 1063934861,
           "operationName": "query",
           "query": Object {
             "definitions": Array [
@@ -344,7 +355,7 @@ describe('on request message', () => {
                 "directives": Array [],
                 "kind": "OperationDefinition",
                 "loc": Object {
-                  "end": 54,
+                  "end": 62,
                   "start": 0,
                 },
                 "name": undefined,
@@ -352,7 +363,7 @@ describe('on request message', () => {
                 "selectionSet": Object {
                   "kind": "SelectionSet",
                   "loc": Object {
-                    "end": 54,
+                    "end": 62,
                     "start": 6,
                   },
                   "selections": Array [
@@ -362,22 +373,22 @@ describe('on request message', () => {
                       "directives": Array [],
                       "kind": "Field",
                       "loc": Object {
-                        "end": 46,
-                        "start": 16,
+                        "end": 52,
+                        "start": 18,
                       },
                       "name": Object {
                         "kind": "Name",
                         "loc": Object {
-                          "end": 21,
-                          "start": 16,
+                          "end": 23,
+                          "start": 18,
                         },
                         "value": "todos",
                       },
                       "selectionSet": Object {
                         "kind": "SelectionSet",
                         "loc": Object {
-                          "end": 46,
-                          "start": 22,
+                          "end": 52,
+                          "start": 24,
                         },
                         "selections": Array [
                           Object {
@@ -386,14 +397,14 @@ describe('on request message', () => {
                             "directives": Array [],
                             "kind": "Field",
                             "loc": Object {
-                              "end": 36,
-                              "start": 34,
+                              "end": 40,
+                              "start": 38,
                             },
                             "name": Object {
                               "kind": "Name",
                               "loc": Object {
-                                "end": 36,
-                                "start": 34,
+                                "end": 40,
+                                "start": 38,
                               },
                               "value": "id",
                             },
@@ -409,7 +420,7 @@ describe('on request message', () => {
             ],
             "kind": "Document",
             "loc": Object {
-              "end": 54,
+              "end": 62,
               "start": 0,
             },
           },

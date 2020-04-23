@@ -31,10 +31,16 @@ export const devtoolsExchange: Exchange = ({ client, forward }) => {
   };
 
   // Listen for messages from content script
-  window.addEventListener(DevtoolsExchangeIncomingEventType, (event) => {
-    const e = event as CustomEvent<DevtoolsExchangeIncomingMessage>;
-    const handler = messageHandlers[e.detail.type];
-    handler && handler(client)(e.detail);
+  window.addEventListener('message', ({ data, isTrusted }) => {
+    if (!isTrusted || data?.type !== DevtoolsExchangeIncomingEventType) {
+      return;
+    }
+
+    const message = data.message as DevtoolsExchangeIncomingMessage;
+
+    // const e = event as CustomEvent<DevtoolsExchangeIncomingMessage>;
+    const handler = messageHandlers[message.type];
+    handler && handler(client)(message);
   });
 
   // Tell the content script we are present
@@ -95,11 +101,13 @@ const handleResult = ({ operation, data, error }: OperationResult) => {
   });
 };
 
-const sendToContentScript = (detail: DevtoolsExchangeOutgoingMessage) =>
-  window.dispatchEvent(
-    new CustomEvent(DevtoolsExchangeOutgoingEventType, {
-      detail: JSON.parse(JSON.stringify(detail)),
-    })
+const sendToContentScript = (message: DevtoolsExchangeOutgoingMessage) =>
+  window.postMessage(
+    {
+      type: DevtoolsExchangeOutgoingEventType,
+      message: JSON.parse(JSON.stringify(message)),
+    },
+    window.location.origin
   );
 
 const sendDevtoolsDebug = <T extends string>(debug: DebugEventArg<T>) =>
