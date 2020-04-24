@@ -5,6 +5,7 @@ import {
   Operation,
   OperationResult,
   DebugEventArg,
+  ExchangeIO,
 } from '@urql/core';
 import {
   DevtoolsExchangeOutgoingMessage,
@@ -13,62 +14,68 @@ import {
   DevtoolsExchangeIncomingEventType,
   DevtoolsExchangeIncomingMessage,
 } from './types';
-import { getDisplayName, hash } from './utils';
+import { getDisplayName, hash, createDebugMessage } from './utils';
 import { parse } from 'graphql';
 
 declare const __pkg_version__: string;
 
-export const devtoolsExchange: Exchange = ({ client, forward }) => {
-  if (
-    typeof window === 'undefined' ||
-    process?.env?.NODE_ENV === 'production'
-  ) {
-    return (ops$) => pipe(ops$, forward);
-  }
+type CurriedArgs = {
+  addMessageListener: (
+    cb: (m: DevtoolsExchangeIncomingMessage) => void
+  ) => void;
+  sendMessage: (m: DevtoolsExchangeOutgoingMessage) => void;
+};
 
-  window.__urql_devtools__ = {
-    version: __pkg_version__,
-  };
-
+const curriedDevtoolsExchange = ({
+  sendMessage,
+  addMessageListener,
+}: CurriedArgs): Exchange => ({ client, forward }) => {
   // Listen for messages from content script
-  window.addEventListener('message', ({ data, isTrusted }) => {
-    if (!isTrusted || data?.type !== DevtoolsExchangeIncomingEventType) {
-      return;
-    }
-
-    const message = data.message as DevtoolsExchangeIncomingMessage;
-
-    // const e = event as CustomEvent<DevtoolsExchangeIncomingMessage>;
+  addMessageListener((message) => {
     const handler = messageHandlers[message.type];
     handler && handler(client)(message);
   });
 
   // Tell the content script we are present
-  sendToContentScript({ type: 'init' });
+  sendMessage({ type: 'init' });
 
   // Forward debug events to content script
   client.subscribeToDebugTarget &&
     client.subscribeToDebugTarget((event) =>
-      sendToContentScript({
+      sendMessage({
         type: 'debug',
         data: event,
       })
     );
 
-  return (ops$) => pipe(ops$, tap(handleOperation), forward, tap(handleResult));
+  return (ops$) =>
+    pipe(
+      ops$,
+      tap(handleOperation({ sendMessage })),
+      forward,
+      tap(handleResult)
+    );
+};
+
+type HandlerArgs = {
+  sendMessage: CurriedArgs['sendMessage'];
 };
 
 /** Handle outgoing operations */
-const handleOperation = (operation: Operation) => {
+const handleOperation = ({ sendMessage }: HandlerArgs) => (
+  operation: Operation
+) => {
   if (operation.operationName === 'teardown') {
-    return sendDevtoolsDebug({
+    const msg = createDebugMessage({
       type: 'teardown',
       message: 'The operation has been torn down',
       operation,
     });
+
+    return sendMessage(msg);
   }
 
-  return sendDevtoolsDebug({
+  const msg = createDebugMessage({
     type: 'execution',
     message: 'The client has recieved an execute command.',
     operation,
@@ -76,12 +83,17 @@ const handleOperation = (operation: Operation) => {
       sourceComponent: getDisplayName(),
     },
   });
+  return sendMessage(msg);
 };
 
 /** Handle new value or error */
-const handleResult = ({ operation, data, error }: OperationResult) => {
+const handleResult = ({ sendMessage }: HandlerArgs) => ({
+  operation,
+  data,
+  error,
+}: OperationResult) => {
   if (error) {
-    return sendDevtoolsDebug({
+    const msg = createDebugMessage({
       type: 'error',
       message: 'The operation has returned a new error.',
       operation,
@@ -89,9 +101,10 @@ const handleResult = ({ operation, data, error }: OperationResult) => {
         value: error,
       },
     });
+    return sendMessage(msg);
   }
 
-  return sendDevtoolsDebug({
+  const msg = createDebugMessage({
     type: 'update',
     message: 'The operation has returned a new response.',
     operation,
@@ -99,26 +112,8 @@ const handleResult = ({ operation, data, error }: OperationResult) => {
       value: data,
     },
   });
+  sendMessage(msg);
 };
-
-const sendToContentScript = (message: DevtoolsExchangeOutgoingMessage) =>
-  window.postMessage(
-    {
-      type: DevtoolsExchangeOutgoingEventType,
-      message: JSON.parse(JSON.stringify(message)),
-    },
-    window.location.origin
-  );
-
-const sendDevtoolsDebug = <T extends string>(debug: DebugEventArg<T>) =>
-  sendToContentScript({
-    type: 'debug',
-    data: {
-      ...debug,
-      source: 'devtoolsExchange',
-      timestamp: Date.now(),
-    },
-  });
 
 /** Handles execute request messages. */
 const requestHandler = (client: Client) => (message: ExecuteRequestMessage) => {
@@ -144,3 +139,64 @@ const requestHandler = (client: Client) => (message: ExecuteRequestMessage) => {
 const messageHandlers = {
   request: requestHandler,
 } as const;
+
+/** Create curried args for browser environment. */
+const createBrowserArgs = (): CurriedArgs => ({
+  addMessageListener: (cb) => {
+    window.addEventListener('message', ({ data, isTrusted }) => {
+      if (!isTrusted || data?.type !== DevtoolsExchangeIncomingEventType) {
+        return;
+      }
+
+      cb(data.message as DevtoolsExchangeIncomingMessage);
+    });
+  },
+  sendMessage: (message) => {
+    window.postMessage(
+      {
+        type: DevtoolsExchangeOutgoingEventType,
+        message: JSON.parse(JSON.stringify(message)),
+      },
+      window.location.origin
+    );
+  },
+});
+
+/** Create curried args for native environment. */
+const createNativeArgs = (): CurriedArgs => {
+  const ws = new WebSocket('ws://localhost:7700');
+
+  ws.onclose = () => console.warn('Websocket connection closed');
+  ws.onerror = (err) => console.warn('Websocket error: ', err);
+
+  return {
+    addMessageListener: (cb) => {
+      ws.onmessage = (message) => {
+        if (message.data) {
+          cb(message.data as DevtoolsExchangeIncomingMessage);
+        }
+      };
+    },
+    sendMessage: (message) => ws.send(JSON.parse(JSON.stringify(message))),
+  };
+};
+
+const createExchange = (): Exchange => {
+  const isNative = navigator?.product === 'ReactNative';
+
+  // Prod or SSR
+  if (
+    process?.env?.NODE_ENV === 'production' ||
+    (!isNative && typeof window === undefined)
+  ) {
+    return ({ forward }) => (ops$) => pipe(ops$, forward);
+  }
+
+  if (isNative) {
+    return curriedDevtoolsExchange(createNativeArgs());
+  }
+
+  return curriedDevtoolsExchange(createBrowserArgs());
+};
+
+export const devtoolsExchange = createExchange();
