@@ -5,7 +5,7 @@ import {
   DevtoolsExchangeOutgoingEventType,
 } from 'types';
 
-export interface Messager {
+export interface Messenger {
   addMessageListener: (
     cb: (m: DevtoolsExchangeIncomingMessage) => void
   ) => void;
@@ -13,7 +13,7 @@ export interface Messager {
 }
 
 /** Create curried args for native environment. */
-export const createNativeMessager = (): Messager => {
+export const createNativeMessenger = (): Messenger => {
   const ws = new WebSocket('ws://localhost:7700');
 
   ws.onclose = () => console.warn('Websocket connection closed');
@@ -32,7 +32,7 @@ export const createNativeMessager = (): Messager => {
 };
 
 /** Create curried args for browser environment. */
-export const createBrowserMessager = (): Messager => ({
+export const createBrowserMessenger = (): Messenger => ({
   addMessageListener: (cb) => {
     window.addEventListener('message', ({ data, isTrusted }) => {
       if (!isTrusted || data?.type !== DevtoolsExchangeIncomingEventType) {

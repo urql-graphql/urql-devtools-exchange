@@ -1,26 +1,24 @@
 import { pipe, tap, take, toPromise } from 'wonka';
 import { Exchange, Client, Operation, OperationResult } from '@urql/core';
-import {
-  DevtoolsExchangeOutgoingMessage,
-  DevtoolsExchangeOutgoingEventType,
-  ExecuteRequestMessage,
-  DevtoolsExchangeIncomingEventType,
-  DevtoolsExchangeIncomingMessage,
-} from './types';
+import { ExecuteRequestMessage } from './types';
 import {
   getDisplayName,
   hash,
   createDebugMessage,
-  createNativeMessager,
-  createBrowserMessager,
-  Messager,
+  createNativeMessenger,
+  createBrowserMessenger,
+  Messenger,
 } from './utils';
 import { parse } from 'graphql';
 
-const curriedDevtoolsExchange = ({
+interface HandlerArgs {
+  sendMessage: Messenger['sendMessage'];
+}
+
+const curriedDevtoolsExchange: (a: Messenger) => Exchange = ({
   sendMessage,
   addMessageListener,
-}: Messager): Exchange => ({ client, forward }) => {
+}) => ({ client, forward }) => {
   // Listen for messages from content script
   addMessageListener((message) => {
     const handler = messageHandlers[message.type];
@@ -44,12 +42,8 @@ const curriedDevtoolsExchange = ({
       ops$,
       tap(handleOperation({ sendMessage })),
       forward,
-      tap(handleResult)
+      tap(handleResult({ sendMessage }))
     );
-};
-
-type HandlerArgs = {
-  sendMessage: Messager['sendMessage'];
 };
 
 /** Handle outgoing operations */
@@ -143,10 +137,10 @@ const createExchange = (): Exchange => {
   }
 
   if (isNative) {
-    return curriedDevtoolsExchange(createNativeMessager());
+    return curriedDevtoolsExchange(createNativeMessenger());
   }
 
-  return curriedDevtoolsExchange(createBrowserMessager());
+  return curriedDevtoolsExchange(createBrowserMessenger());
 };
 
 export const devtoolsExchange = createExchange();
