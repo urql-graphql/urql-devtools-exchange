@@ -1,12 +1,5 @@
 import { pipe, tap, take, toPromise } from 'wonka';
-import {
-  Exchange,
-  Client,
-  Operation,
-  OperationResult,
-  DebugEventArg,
-  ExchangeIO,
-} from '@urql/core';
+import { Exchange, Client, Operation, OperationResult } from '@urql/core';
 import {
   DevtoolsExchangeOutgoingMessage,
   DevtoolsExchangeOutgoingEventType,
@@ -14,22 +7,20 @@ import {
   DevtoolsExchangeIncomingEventType,
   DevtoolsExchangeIncomingMessage,
 } from './types';
-import { getDisplayName, hash, createDebugMessage } from './utils';
+import {
+  getDisplayName,
+  hash,
+  createDebugMessage,
+  createNativeMessager,
+  createBrowserMessager,
+  Messager,
+} from './utils';
 import { parse } from 'graphql';
-
-declare const __pkg_version__: string;
-
-type CurriedArgs = {
-  addMessageListener: (
-    cb: (m: DevtoolsExchangeIncomingMessage) => void
-  ) => void;
-  sendMessage: (m: DevtoolsExchangeOutgoingMessage) => void;
-};
 
 const curriedDevtoolsExchange = ({
   sendMessage,
   addMessageListener,
-}: CurriedArgs): Exchange => ({ client, forward }) => {
+}: Messager): Exchange => ({ client, forward }) => {
   // Listen for messages from content script
   addMessageListener((message) => {
     const handler = messageHandlers[message.type];
@@ -58,7 +49,7 @@ const curriedDevtoolsExchange = ({
 };
 
 type HandlerArgs = {
-  sendMessage: CurriedArgs['sendMessage'];
+  sendMessage: Messager['sendMessage'];
 };
 
 /** Handle outgoing operations */
@@ -140,47 +131,6 @@ const messageHandlers = {
   request: requestHandler,
 } as const;
 
-/** Create curried args for browser environment. */
-const createBrowserArgs = (): CurriedArgs => ({
-  addMessageListener: (cb) => {
-    window.addEventListener('message', ({ data, isTrusted }) => {
-      if (!isTrusted || data?.type !== DevtoolsExchangeIncomingEventType) {
-        return;
-      }
-
-      cb(data.message as DevtoolsExchangeIncomingMessage);
-    });
-  },
-  sendMessage: (message) => {
-    window.postMessage(
-      {
-        type: DevtoolsExchangeOutgoingEventType,
-        message: JSON.parse(JSON.stringify(message)),
-      },
-      window.location.origin
-    );
-  },
-});
-
-/** Create curried args for native environment. */
-const createNativeArgs = (): CurriedArgs => {
-  const ws = new WebSocket('ws://localhost:7700');
-
-  ws.onclose = () => console.warn('Websocket connection closed');
-  ws.onerror = (err) => console.warn('Websocket error: ', err);
-
-  return {
-    addMessageListener: (cb) => {
-      ws.onmessage = (message) => {
-        if (message.data) {
-          cb(message.data as DevtoolsExchangeIncomingMessage);
-        }
-      };
-    },
-    sendMessage: (message) => ws.send(JSON.parse(JSON.stringify(message))),
-  };
-};
-
 const createExchange = (): Exchange => {
   const isNative = navigator?.product === 'ReactNative';
 
@@ -193,10 +143,10 @@ const createExchange = (): Exchange => {
   }
 
   if (isNative) {
-    return curriedDevtoolsExchange(createNativeArgs());
+    return curriedDevtoolsExchange(createNativeMessager());
   }
 
-  return curriedDevtoolsExchange(createBrowserArgs());
+  return curriedDevtoolsExchange(createBrowserMessager());
 };
 
 export const devtoolsExchange = createExchange();
