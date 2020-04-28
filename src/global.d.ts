@@ -6,3 +6,5 @@ declare namespace NodeJS {
     };
   }
 }
+
+declare const __pkg_version__: string;

@@ -1,6 +1,6 @@
 import { pipe, tap, take, toPromise } from 'wonka';
 import { Exchange, Client, Operation, OperationResult } from '@urql/core';
-import { ExecuteRequestMessage } from './types';
+import { ExecuteRequestMessage, GetVersionMessage } from './types';
 import {
   getDisplayName,
   hash,
@@ -19,14 +19,16 @@ const curriedDevtoolsExchange: (a: Messenger) => Exchange = ({
   sendMessage,
   addMessageListener,
 }) => ({ client, forward }) => {
-  // Listen for messages from content script
-  addMessageListener((message) => {
-    const handler = messageHandlers[message.type];
-    handler && handler(client)(message);
-  });
-
   // Tell the content script we are present
   sendMessage({ type: 'init' });
+
+  // Listen for messages from content script
+  addMessageListener((message) => {
+    if (!(message.type in messageHandlers)) {
+      return;
+    }
+    messageHandlers[message.type]({ client, sendMessage })(message as any);
+  });
 
   // Forward debug events to content script
   client.subscribeToDebugTarget &&
@@ -40,11 +42,16 @@ const curriedDevtoolsExchange: (a: Messenger) => Exchange = ({
   return (ops$) =>
     pipe(
       ops$,
-      tap(handleOperation({ sendMessage })),
+      tap(handleOperation({ client, sendMessage })),
       forward,
-      tap(handleResult({ sendMessage }))
+      tap(handleResult({ client, sendMessage }))
     );
 };
+
+interface HandlerArgs {
+  client: Client;
+  sendMessage: Messenger['sendMessage'];
+}
 
 /** Handle outgoing operations */
 const handleOperation = ({ sendMessage }: HandlerArgs) => (
@@ -101,7 +108,9 @@ const handleResult = ({ sendMessage }: HandlerArgs) => ({
 };
 
 /** Handles execute request messages. */
-const requestHandler = (client: Client) => (message: ExecuteRequestMessage) => {
+const handleRequest = ({ client }: HandlerArgs) => (
+  message: ExecuteRequestMessage
+) => {
   const isMutation = /(^|\W)+mutation\W/.test(message.query);
   const requestType = isMutation ? 'mutation' : 'query';
   const op = client.createRequestOperation(
@@ -120,12 +129,18 @@ const requestHandler = (client: Client) => (message: ExecuteRequestMessage) => {
   pipe(client.executeRequestOperation(op), take(1), toPromise);
 };
 
+/** Handles get version info request. */
+const handleVersionRequest = ({ sendMessage }: HandlerArgs) => () => {
+  sendMessage({ type: 'declare-version', version: __pkg_version__ });
+};
+
 /** Map of handlers for incoming messages. */
 const messageHandlers = {
-  request: requestHandler,
+  request: handleRequest,
+  'get-version': handleVersionRequest,
 } as const;
 
-const createExchange = (): Exchange => {
+export const devtoolsExchange = ((): Exchange => {
   const isNative = navigator?.product === 'ReactNative';
 
   // Prod or SSR
@@ -141,6 +156,4 @@ const createExchange = (): Exchange => {
   }
 
   return curriedDevtoolsExchange(createBrowserMessenger());
-};
-
-export const devtoolsExchange = createExchange();
+})();
