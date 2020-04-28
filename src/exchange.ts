@@ -142,12 +142,10 @@ const messageHandlers = {
 
 export const devtoolsExchange = ((): Exchange => {
   const isNative = navigator?.product === 'ReactNative';
+  const isSSR = !isNative && typeof window === undefined;
 
   // Prod or SSR
-  if (
-    process?.env?.NODE_ENV === 'production' ||
-    (!isNative && typeof window === undefined)
-  ) {
+  if (process?.env?.NODE_ENV === 'production' || isSSR) {
     return ({ forward }) => (ops$) => pipe(ops$, forward);
   }
 
