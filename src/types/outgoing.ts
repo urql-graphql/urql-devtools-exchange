@@ -6,8 +6,8 @@ export interface InitMessage {
 }
 
 /** Declare running exchange version (part of handshaking). */
-export interface DeclareVersionMessage {
-  type: 'declare-version';
+export interface ExchangeVersionResponseMessage {
+  type: 'exchange-version-response';
   version: string;
 }
 
@@ -26,7 +26,7 @@ export interface DebugMessage<T extends string = string> {
 export type DevtoolsExchangeOutgoingMessage =
   | DebugMessage
   | DisconnectMessage
-  | DeclareVersionMessage
+  | ExchangeVersionResponseMessage
   | InitMessage;
 
 /** Event type associated with events triggered by the exchange. */

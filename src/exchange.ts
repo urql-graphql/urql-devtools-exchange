@@ -131,13 +131,13 @@ const handleRequest = ({ client }: HandlerArgs) => (
 
 /** Handles get version info request. */
 const handleVersionRequest = ({ sendMessage }: HandlerArgs) => () => {
-  sendMessage({ type: 'declare-version', version: __pkg_version__ });
+  sendMessage({ type: 'exchange-version-response', version: __pkg_version__ });
 };
 
 /** Map of handlers for incoming messages. */
 const messageHandlers = {
   request: handleRequest,
-  'get-version': handleVersionRequest,
+  'exchange-version-request': handleVersionRequest,
 } as const;
 
 export const devtoolsExchange = ((): Exchange => {

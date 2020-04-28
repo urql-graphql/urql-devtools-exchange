@@ -5,12 +5,12 @@ export interface ExecuteRequestMessage {
 }
 
 /** Request version info about currently running exchange. */
-export interface GetVersionMessage {
-  type: 'get-version';
+export interface ExchangeVersionRequestMessage {
+  type: 'exchange-version-request';
 }
 
 export type DevtoolsExchangeIncomingMessage =
   | ExecuteRequestMessage
-  | GetVersionMessage;
+  | ExchangeVersionRequestMessage;
 
 export const DevtoolsExchangeIncomingEventType = 'urql-devtools-exchange-in' as const;
