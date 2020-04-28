@@ -1,5 +1,6 @@
 declare namespace NodeJS {
   interface Global {
+    WebSocket: WebSocket;
     window: {
       addEventListener: () => void;
       postMessage: (m: any) => void;

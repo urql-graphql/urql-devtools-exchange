@@ -3,7 +3,7 @@ import {
   DevtoolsExchangeOutgoingMessage,
   DevtoolsExchangeIncomingEventType,
   DevtoolsExchangeOutgoingEventType,
-} from 'types';
+} from '../types';
 
 export interface Messenger {
   addMessageListener: (
