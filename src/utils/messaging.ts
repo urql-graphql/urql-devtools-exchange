@@ -14,25 +14,39 @@ export interface Messenger {
 
 /** Create curried args for native environment. */
 export const createNativeMessenger = (): Messenger => {
-  const ws = new WebSocket('ws://localhost:7700');
+  let listeners: Function[] = [];
+  let ws: WebSocket;
+  let timeout: NodeJS.Timeout | undefined;
 
-  ws.onopen = () => console.log('WS connected');
-  ws.onclose = () => console.warn('Websocket connection closed');
-  ws.onerror = (err) => console.warn('Websocket error: ', err);
+  const createConnection = () => {
+    timeout = undefined;
+    ws = new WebSocket('ws://localhost:7700');
+
+    ws.onclose = () => {
+      timeout = timeout || setTimeout(createConnection, 500);
+    };
+    ws.onerror = () => {
+      timeout = timeout || setTimeout(createConnection, 500);
+    };
+    ws.onmessage = (message) => {
+      try {
+        if (!message.data) {
+          return;
+        }
+
+        listeners.forEach((l) =>
+          l(JSON.parse(message.data) as DevtoolsExchangeIncomingMessage)
+        );
+      } catch (err) {
+        console.warn(err);
+      }
+    };
+  };
+  createConnection();
 
   return {
     addMessageListener: (cb) => {
-      ws.onmessage = (message) => {
-        try {
-          if (!message.data) {
-            return;
-          }
-
-          cb(JSON.parse(message.data) as DevtoolsExchangeIncomingMessage);
-        } catch (err) {
-          console.warn(err);
-        }
-      };
+      listeners = [...listeners, cb];
     },
     sendMessage: (message) => {
       ws.readyState === ws.OPEN && ws.send(JSON.stringify(message));
