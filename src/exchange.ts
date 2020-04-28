@@ -69,7 +69,7 @@ const handleOperation = ({ sendMessage }: HandlerArgs) => (
 
   const msg = createDebugMessage({
     type: 'execution',
-    message: 'The client has recieved an execute command.',
+    message: 'The client has received an execute command.',
     operation,
     data: {
       sourceComponent: getDisplayName(),
