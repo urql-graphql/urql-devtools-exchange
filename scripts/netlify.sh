@@ -1,4 +1,4 @@
 #!/bin/bash
 yarn build
-yarn example:create
+yarn example:init
 yarn example:build
