@@ -16,7 +16,7 @@
     "check": "tsc --noEmit",
     "example:init": "./scripts/create-example.sh",
     "example:start": "cd example && yarn start",
-    "example:build": "cd example && yarn build",
+    "example:build": "cd example && NODE_ENV=development yarn build --no-minify",
     "prettier-check": "prettier -c .",
     "prepublishOnly": "run-s clean build",
     "changelog": "docker run -it --rm -v \"$(pwd)\":/usr/local/src/your-app ferrarimarco/github-changelog-generator -u FormidableLabs -p urql-devtools-exchange"
