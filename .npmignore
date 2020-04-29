@@ -4,6 +4,7 @@
 !README.md
 !/dist
 !/src/**/*.{d.ts,ts,tsx}
+/example
 __snapshots__/
 __tests__/
 test-utils/

@@ -8,12 +8,15 @@
   "source": "src/index.ts",
   "sideEffects": false,
   "scripts": {
+    "start": "yarn build -w",
     "clean": "rimraf ./dist ./node_modules/.cache",
     "build": "rollup -c rollup.config.js",
-    "watch": "rollup -w -c rollup.config.js",
     "test": "jest",
     "lint": "eslint . --ext .ts,.tsx",
     "check": "tsc --noEmit",
+    "example:init": "./scripts/create-example.sh",
+    "example:start": "cd example && yarn start",
+    "example:build": "cd example && yarn build",
     "prettier-check": "prettier -c .",
     "prepublishOnly": "run-s clean build",
     "changelog": "docker run -it --rm -v \"$(pwd)\":/usr/local/src/your-app ferrarimarco/github-changelog-generator -u FormidableLabs -p urql-devtools-exchange"
