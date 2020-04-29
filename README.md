@@ -3,7 +3,7 @@
   <h1>Urql Devtools Exchange</h1>
   <p>The official devtools exchange for use with the <a href="https://github.com/FormidableLabs/urql-devtools">Urql Devtools</a> browser extension</p>
   <a href="https://circleci.com/gh/FormidableLabs/workflows/urql-devtools-exchange">
-    <img alt="CircleCI Build Status" src="https://badgen.net/circleci/github/FormidableLabs/urql-devtools-exchange?label=build" />
+    <img alt="CircleCI Build Status" src="https://badgen.net/circleci/github/FormidableLabs/urql-devtools-exchange/master?label=build" />
   </a>
   <a href="https://www.npmjs.com/package/@urql/devtools">
     <img alt="NPM Release" src="https://badgen.net/npm/v/@urql/devtools" />
