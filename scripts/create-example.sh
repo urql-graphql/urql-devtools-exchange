@@ -13,5 +13,8 @@ rm -r $TMP
 
 # Add link for exchange
 cd $CWD/../example
-sed -i -e 's|^{|{"alias":{"@urql/devtools": "../"},|' package.json
+sed -i -e 's|^{$|{\
+  "alias": {\
+    "@urql/devtools": "../"\
+  },|' package.json
 yarn
