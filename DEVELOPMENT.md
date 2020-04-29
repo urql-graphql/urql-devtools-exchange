@@ -13,6 +13,12 @@ Under the hood, this exchange has a small set of responsibilities:
 
 Here are a few useful approaches to get started developing.
 
+### Live project
+
+If you just need a working project which uses the devtools exchange (useful when working on devtools), there's a [live project here](https://urql-devtools-exchange.netlify.app/).
+
+> Note: The live project uses the devtools exchange from master
+
 ### Shallow environment
 
 The easiest way to get started on a change in devtools is in a testing shallow environment.
