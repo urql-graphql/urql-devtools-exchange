@@ -16,38 +16,33 @@ Luckily it's not hard to get started. You can install dependencies using `yarn`.
 yarn
 ```
 
-Run `yarn start` to initiate the Webpack and TypeScript build (for the extension and exchange, respectively).
+Run the following command to start a watched build of the exchange.
 
 ```sh
 yarn start
 ```
 
-### Start an urql example repo
+### Start an urql example project
 
-Devtools will only be accessible if a development instance of `urql` is running.
+To test the exchange alongside devtools, you can run an example project.
 
-Clone the [Urql repo](https://github.com/FormidableLabs/urql).
+#### Initialize the example
 
-Change the client configuration in the example to look like this:
+An example repo can be created to test changes in a browser.
 
-```tsx
-// ...
-import {
-  cacheExchange,
-  createClient,
-  dedupExchange,
-  fetchExchange,
-} from '@urql/core';
-import { devtoolsExchange } from '<path-to-devtools-dist>/exchange';
-
-// ...
-const client = createClient({
-  url: 'http://localhost:3001/graphql',
-  exchanges: [dedupExchange, devtoolsExchange, cacheExchange, fetchExchange],
-});
+```
+yarn example:init
 ```
 
-Start the example repo with `yarn start`.
+#### Run server
+
+Start the example server.
+
+```
+yarn example:start
+```
+
+> Note: changes will auto update assuming you're running a watched build
 
 ## How do I publish a new version?
 

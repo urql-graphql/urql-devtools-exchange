@@ -14,7 +14,7 @@
     "test": "jest",
     "lint": "eslint . --ext .ts,.tsx",
     "check": "tsc --noEmit",
-    "example:create": "./scripts/create-example.sh",
+    "example:init": "./scripts/create-example.sh",
     "example:start": "cd example && yarn start",
     "example:build": "cd example && yarn build",
     "prettier-check": "prettier -c .",
