@@ -21,6 +21,7 @@ declare const __pkg_version__: string;
 export const devtoolsExchange: Exchange = ({ client, forward }) => {
   if (
     typeof window === 'undefined' ||
+    typeof process === 'undefined' ||
     process?.env?.NODE_ENV === 'production'
   ) {
     return (ops$) => pipe(ops$, forward);
