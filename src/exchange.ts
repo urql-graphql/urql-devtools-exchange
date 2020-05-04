@@ -1,6 +1,6 @@
 import { pipe, tap, take, toPromise } from 'wonka';
 import { Exchange, Client, Operation, OperationResult } from '@urql/core';
-import { ExecuteRequestMessage, GetVersionMessage } from './types';
+import { DevtoolsExecuteQueryMessage } from './types';
 import {
   getDisplayName,
   hash,
@@ -19,14 +19,19 @@ const curriedDevtoolsExchange: (a: Messenger) => Exchange = ({
   sendMessage,
   addMessageListener,
 }) => ({ client, forward }) => {
-  // Tell the content script we are present
-  sendMessage({ type: 'init' });
+  // Initialize connection
+  sendMessage({
+    type: 'connection-init',
+    source: 'exchange',
+    version: __pkg_version__,
+  });
 
-  // Listen for messages from content script
+  // Listen for messages from devtools
   addMessageListener((message) => {
-    if (!(message.type in messageHandlers)) {
+    if (message.source !== 'devtools' || !(message.type in messageHandlers)) {
       return;
     }
+
     messageHandlers[message.type]({ client, sendMessage })(message as any);
   });
 
@@ -34,7 +39,8 @@ const curriedDevtoolsExchange: (a: Messenger) => Exchange = ({
   client.subscribeToDebugTarget &&
     client.subscribeToDebugTarget((event) =>
       sendMessage({
-        type: 'debug',
+        type: 'debug-event',
+        source: 'exchange',
         data: event,
       })
     );
@@ -107,9 +113,9 @@ const handleResult = ({ sendMessage }: HandlerArgs) => ({
   sendMessage(msg);
 };
 
-/** Handles execute request messages. */
-const handleRequest = ({ client }: HandlerArgs) => (
-  message: ExecuteRequestMessage
+/** Handle execute request message. */
+const handleExecuteQueryMessage = ({ client }: HandlerArgs) => (
+  message: DevtoolsExecuteQueryMessage
 ) => {
   const isMutation = /(^|\W)+mutation\W/.test(message.query);
   const requestType = isMutation ? 'mutation' : 'query';
@@ -129,15 +135,18 @@ const handleRequest = ({ client }: HandlerArgs) => (
   pipe(client.executeRequestOperation(op), take(1), toPromise);
 };
 
-/** Handles get version info request. */
-const handleVersionRequest = ({ sendMessage }: HandlerArgs) => () => {
-  sendMessage({ type: 'exchange-version-response', version: __pkg_version__ });
-};
+/** Handle connection initiated by devtools. */
+const handleConnectionInitMessage = ({ sendMessage }: HandlerArgs) => () =>
+  sendMessage({
+    type: 'connection-acknowledge',
+    source: 'exchange',
+    version: __pkg_version__,
+  });
 
 /** Map of handlers for incoming messages. */
 const messageHandlers = {
-  request: handleRequest,
-  'exchange-version-request': handleVersionRequest,
+  'execute-query': handleExecuteQueryMessage,
+  'connection-init': handleConnectionInitMessage,
 } as const;
 
 export const devtoolsExchange = ((): Exchange => {

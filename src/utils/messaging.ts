@@ -1,15 +1,10 @@
-import {
-  DevtoolsExchangeIncomingMessage,
-  DevtoolsExchangeOutgoingMessage,
-  DevtoolsExchangeIncomingEventType,
-  DevtoolsExchangeOutgoingEventType,
-} from '../types';
+import { ExchangeMessage, DevtoolsMessage } from '../types';
 
 export interface Messenger {
   addMessageListener: (
-    cb: (m: DevtoolsExchangeIncomingMessage) => void
+    cb: (m: ExchangeMessage | DevtoolsMessage) => void
   ) => void;
-  sendMessage: (m: DevtoolsExchangeOutgoingMessage) => void;
+  sendMessage: (m: ExchangeMessage) => void;
 }
 
 /** Create curried args for native environment. */
@@ -35,7 +30,7 @@ export const createNativeMessenger = (): Messenger => {
         }
 
         listeners.forEach((l) =>
-          l(JSON.parse(message.data) as DevtoolsExchangeIncomingMessage)
+          l(JSON.parse(message.data) as ExchangeMessage | DevtoolsMessage)
         );
       } catch (err) {
         console.warn(err);
@@ -58,19 +53,16 @@ export const createNativeMessenger = (): Messenger => {
 export const createBrowserMessenger = (): Messenger => ({
   addMessageListener: (cb) => {
     window.addEventListener('message', ({ data, isTrusted }) => {
-      if (!isTrusted || data?.type !== DevtoolsExchangeIncomingEventType) {
+      if (!isTrusted || !data?.source) {
         return;
       }
 
-      cb(data.message as DevtoolsExchangeIncomingMessage);
+      cb(data as ExchangeMessage | DevtoolsMessage);
     });
   },
   sendMessage: (message) => {
     window.postMessage(
-      {
-        type: DevtoolsExchangeOutgoingEventType,
-        message: JSON.parse(JSON.stringify(message)),
-      },
+      JSON.parse(JSON.stringify(message)),
       window.location.origin
     );
   },

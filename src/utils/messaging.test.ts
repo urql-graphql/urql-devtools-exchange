@@ -1,6 +1,4 @@
 import { createBrowserMessenger, createNativeMessenger } from './messaging';
-import { DevtoolsExchangeIncomingEventType } from '../types';
-
 let instance: any = {};
 const WebSocket = jest.fn(function () {
   instance = {};
@@ -82,7 +80,8 @@ describe('on create browser messenger', () => {
   describe('on trusted message', () => {
     it('calls message listeners', () => {
       const data = {
-        type: DevtoolsExchangeIncomingEventType,
+        type: 'init',
+        source: 'devtools',
         message: { test: 1234 },
       };
       const listener = jest.fn();
@@ -94,14 +93,15 @@ describe('on create browser messenger', () => {
       handler({ data, isTrusted: true });
 
       expect(listener).toBeCalledTimes(1);
-      expect(listener).toBeCalledWith(data.message);
+      expect(listener).toBeCalledWith(data);
     });
   });
 
   describe('on untrusted message', () => {
     it('calls message listeners', () => {
       const data = {
-        type: DevtoolsExchangeIncomingEventType,
+        type: 'init',
+        source: 'devtools',
         message: { test: 1234 },
       };
       const listener = jest.fn();
@@ -129,11 +129,8 @@ describe('on create browser messenger', () => {
       expect(postMessage).toBeCalledTimes(1);
       expect(postMessage.mock.calls[0][0]).toMatchInlineSnapshot(`
         Object {
-          "message": Object {
-            "arg": 1234,
-            "someString": "hello",
-          },
-          "type": "urql-devtools-exchange",
+          "arg": 1234,
+          "someString": "hello",
         }
       `);
     });

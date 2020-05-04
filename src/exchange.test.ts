@@ -72,7 +72,9 @@ describe('on mount', () => {
     it('is dispatched', () => {
       expect(sendMessage).toBeCalledTimes(1);
       expect(sendMessage).toBeCalledWith({
-        type: 'init',
+        type: 'connection-init',
+        source: 'exchange',
+        version,
       });
     });
   });
@@ -95,7 +97,8 @@ describe('on debug message', () => {
 
     expect(sendMessage).toBeCalledTimes(2);
     expect(sendMessage).toBeCalledWith({
-      type: 'debug',
+      type: 'debug-event',
+      source: 'exchange',
       data: event,
     });
   });
@@ -131,7 +134,8 @@ describe('on operation', () => {
               "timestamp": 1234,
               "type": "execution",
             },
-            "type": "debug",
+            "source": "exchange",
+            "type": "debug-event",
           },
         ]
       `);
@@ -164,7 +168,8 @@ describe('on operation', () => {
               "timestamp": 1234,
               "type": "teardown",
             },
-            "type": "debug",
+            "source": "exchange",
+            "type": "debug-event",
           },
         ]
       `);
@@ -239,7 +244,8 @@ describe('on operation response', () => {
               "timestamp": 1234,
               "type": "update",
             },
-            "type": "debug",
+            "source": "exchange",
+            "type": "debug-event",
           },
         ]
       `);
@@ -284,7 +290,8 @@ describe('on operation response', () => {
               "timestamp": 1234,
               "type": "error",
             },
-            "type": "debug",
+            "source": "exchange",
+            "type": "debug-event",
           },
         ]
       `);
@@ -297,7 +304,8 @@ describe('on request message', () => {
   let handler: any;
   const { source } = makeSubject<any>();
   const requestMessage = {
-    type: 'request',
+    type: 'execute-query',
+    source: 'devtools',
     query: `query {
           todos {
             id
@@ -406,11 +414,13 @@ describe('on request message', () => {
   });
 });
 
-describe('on get-version message', () => {
+describe('on connection init message', () => {
   let handler: any;
   const { source } = makeSubject<any>();
   const getVersionMessage = {
-    type: 'get-version',
+    type: 'connection-init',
+    source: 'devtools',
+    version: '100.0.0',
   };
 
   beforeEach(() => {
@@ -418,11 +428,12 @@ describe('on get-version message', () => {
     handler = addMessageListener.mock.calls[0][0];
   });
 
-  it('executes request on client', () => {
+  it('dispatches acknowledge event w/ version', () => {
     handler(getVersionMessage);
     expect(sendMessage).toBeCalledTimes(2);
     expect(sendMessage).toBeCalledWith({
-      type: 'declare-version',
+      type: 'connection-acknowledge',
+      source: 'exchange',
       version,
     });
   });
