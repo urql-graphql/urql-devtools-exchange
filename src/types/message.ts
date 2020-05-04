@@ -52,6 +52,7 @@ export type DevtoolsSource = 'devtools';
 export interface DevtoolsConnectionInitMessage {
   type: 'connection-init';
   source: DevtoolsSource;
+  tabId?: number;
   version: string;
 }
 
