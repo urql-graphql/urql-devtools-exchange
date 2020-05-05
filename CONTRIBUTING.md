@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in contributing to `urlql` Devtools! We want to ensure that the community has opportunities to contribute to `urql` devtools in as many ways as possible, no matter how big or small those contributions may be.
+Thanks for your interest in contributing to `urql` Devtools! We want to ensure that the community has opportunities to contribute to `urql` devtools in as many ways as possible, no matter how big or small those contributions may be.
 
 ## How to contribute?
 
