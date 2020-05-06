@@ -1,5 +1,23 @@
+jest.mock('./utils/messaging', () => {
+  const messenger = {
+    addMessageListener: jest.fn(),
+    sendMessage: jest.fn(),
+  };
+
+  return {
+    messenger,
+    createNativeMessenger: jest.fn(() => messenger),
+    createBrowserMessenger: jest.fn(() => messenger),
+  };
+});
 import { makeSubject, pipe, publish, map } from 'wonka';
 import { devtoolsExchange } from './exchange';
+import { createBrowserMessenger } from './utils';
+
+const {
+  addMessageListener,
+  sendMessage,
+} = (createBrowserMessenger() as any) as Record<string, jest.Mock>;
 
 const version = '200.0.0';
 (global as any).__pkg_version__ = version;
@@ -31,8 +49,6 @@ beforeEach(() => {
     }))(o)
   ) as any;
 });
-const addEventListener = jest.spyOn(window, 'addEventListener');
-const postMessage = jest.spyOn(window, 'postMessage');
 const dispatchDebug = jest.fn();
 
 jest.spyOn(Date, 'now').mockReturnValue(1234);
@@ -46,30 +62,20 @@ describe('on mount', () => {
     pipe(source, devtoolsExchange({ client, forward, dispatchDebug }), publish);
   });
 
-  describe('window', () => {
-    it('has __urql_devtools__ property', () => {
-      expect(window).toHaveProperty('__urql_devtools__', { version });
-    });
-  });
-
-  describe('event listener', () => {
-    it('is added to window', () => {
-      expect(addEventListener).toBeCalledTimes(1);
+  describe('message listener', () => {
+    it('is added', () => {
+      expect(addMessageListener).toBeCalledTimes(1);
     });
   });
 
   describe('init event', () => {
     it('is dispatched', () => {
-      expect(postMessage).toBeCalledTimes(1);
-      expect(postMessage).toBeCalledWith(
-        {
-          type: 'urql-devtools-exchange',
-          message: {
-            type: 'init',
-          },
-        },
-        window.location.origin
-      );
+      expect(sendMessage).toBeCalledTimes(1);
+      expect(sendMessage).toBeCalledWith({
+        type: 'connection-init',
+        source: 'exchange',
+        version,
+      });
     });
   });
 });
@@ -89,17 +95,12 @@ describe('on debug message', () => {
     const subscriber = client.subscribeToDebugTarget.mock.calls[0][0];
     subscriber(event);
 
-    expect(postMessage).toBeCalledTimes(2);
-    expect(postMessage).toBeCalledWith(
-      {
-        type: 'urql-devtools-exchange',
-        message: {
-          type: 'debug',
-          data: event,
-        },
-      },
-      window.location.origin
-    );
+    expect(sendMessage).toBeCalledTimes(2);
+    expect(sendMessage).toBeCalledWith({
+      type: 'debug-event',
+      source: 'exchange',
+      data: event,
+    });
   });
 });
 
@@ -118,27 +119,24 @@ describe('on operation', () => {
         publish
       );
       next(operation);
-      expect(postMessage.mock.calls[1]).toMatchInlineSnapshot(`
+      expect(sendMessage.mock.calls[1]).toMatchInlineSnapshot(`
         Array [
           Object {
-            "message": Object {
+            "data": Object {
               "data": Object {
-                "data": Object {
-                  "sourceComponent": "Unknown",
-                },
-                "message": "The client has recieved an execute command.",
-                "operation": Object {
-                  "operationName": "query",
-                },
-                "source": "devtoolsExchange",
-                "timestamp": 1234,
-                "type": "execution",
+                "sourceComponent": "Unknown",
               },
-              "type": "debug",
+              "message": "The client has received an execute command.",
+              "operation": Object {
+                "operationName": "query",
+              },
+              "source": "devtoolsExchange",
+              "timestamp": 1234,
+              "type": "execution",
             },
-            "type": "urql-devtools-exchange",
+            "source": "exchange",
+            "type": "debug-event",
           },
-          "http://localhost",
         ]
       `);
     });
@@ -158,24 +156,21 @@ describe('on operation', () => {
         publish
       );
       next(operation);
-      expect(postMessage.mock.calls[1]).toMatchInlineSnapshot(`
+      expect(sendMessage.mock.calls[1]).toMatchInlineSnapshot(`
         Array [
           Object {
-            "message": Object {
-              "data": Object {
-                "message": "The operation has been torn down",
-                "operation": Object {
-                  "operationName": "teardown",
-                },
-                "source": "devtoolsExchange",
-                "timestamp": 1234,
-                "type": "teardown",
+            "data": Object {
+              "message": "The operation has been torn down",
+              "operation": Object {
+                "operationName": "teardown",
               },
-              "type": "debug",
+              "source": "devtoolsExchange",
+              "timestamp": 1234,
+              "type": "teardown",
             },
-            "type": "urql-devtools-exchange",
+            "source": "exchange",
+            "type": "debug-event",
           },
-          "http://localhost",
         ]
       `);
     });
@@ -232,29 +227,26 @@ describe('on operation response', () => {
       next(operation);
 
       // * call number two relates to the operation response
-      expect(postMessage.mock.calls[2]).toMatchInlineSnapshot(`
+      expect(sendMessage.mock.calls[2]).toMatchInlineSnapshot(`
         Array [
           Object {
-            "message": Object {
+            "data": Object {
               "data": Object {
-                "data": Object {
-                  "value": Object {
-                    "test": 1234,
-                  },
+                "value": Object {
+                  "test": 1234,
                 },
-                "message": "The operation has returned a new response.",
-                "operation": Object {
-                  "operationName": "mutation",
-                },
-                "source": "devtoolsExchange",
-                "timestamp": 1234,
-                "type": "update",
               },
-              "type": "debug",
+              "message": "The operation has returned a new response.",
+              "operation": Object {
+                "operationName": "mutation",
+              },
+              "source": "devtoolsExchange",
+              "timestamp": 1234,
+              "type": "update",
             },
-            "type": "urql-devtools-exchange",
+            "source": "exchange",
+            "type": "debug-event",
           },
-          "http://localhost",
         ]
       `);
     });
@@ -281,29 +273,26 @@ describe('on operation response', () => {
       );
       next(operation);
       // * call number two relates to the operation response
-      expect(postMessage.mock.calls[2]).toMatchInlineSnapshot(`
+      expect(sendMessage.mock.calls[2]).toMatchInlineSnapshot(`
         Array [
           Object {
-            "message": Object {
+            "data": Object {
               "data": Object {
-                "data": Object {
-                  "value": Object {
-                    "test": 1234,
-                  },
+                "value": Object {
+                  "test": 1234,
                 },
-                "message": "The operation has returned a new error.",
-                "operation": Object {
-                  "operationName": "mutation",
-                },
-                "source": "devtoolsExchange",
-                "timestamp": 1234,
-                "type": "error",
               },
-              "type": "debug",
+              "message": "The operation has returned a new error.",
+              "operation": Object {
+                "operationName": "mutation",
+              },
+              "source": "devtoolsExchange",
+              "timestamp": 1234,
+              "type": "error",
             },
-            "type": "urql-devtools-exchange",
+            "source": "exchange",
+            "type": "debug-event",
           },
-          "http://localhost",
         ]
       `);
     });
@@ -315,23 +304,18 @@ describe('on request message', () => {
   let handler: any;
   const { source } = makeSubject<any>();
   const requestMessage = {
-    isTrusted: true,
-    data: {
-      type: 'urql-devtools-exchange-in',
-      message: {
-        type: 'request',
-        query: `query {
+    type: 'execute-query',
+    source: 'devtools',
+    query: `query {
           todos {
             id
           }
         }`,
-      },
-    },
   };
 
   beforeEach(() => {
     pipe(source, devtoolsExchange({ client, forward, dispatchDebug }), publish);
-    handler = addEventListener.mock.calls[0][1];
+    handler = addMessageListener.mock.calls[0][0];
   });
 
   it('executes request on client', () => {
@@ -427,5 +411,30 @@ describe('on request message', () => {
         },
       ]
     `);
+  });
+});
+
+describe('on connection init message', () => {
+  let handler: any;
+  const { source } = makeSubject<any>();
+  const getVersionMessage = {
+    type: 'connection-init',
+    source: 'devtools',
+    version: '100.0.0',
+  };
+
+  beforeEach(() => {
+    pipe(source, devtoolsExchange({ client, forward, dispatchDebug }), publish);
+    handler = addMessageListener.mock.calls[0][0];
+  });
+
+  it('dispatches acknowledge event w/ version', () => {
+    handler(getVersionMessage);
+    expect(sendMessage).toBeCalledTimes(2);
+    expect(sendMessage).toBeCalledWith({
+      type: 'connection-acknowledge',
+      source: 'exchange',
+      version,
+    });
   });
 });

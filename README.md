@@ -18,7 +18,7 @@
 
 ## About
 
-A first-party exchange for [Urql](https://github.com/FormidableLabs/urql) which interfaces with the [Urql Devtools](https://github.com/FormidableLabs/urql-devtools) browser extension.
+A first-party exchange for [urql](https://github.com/FormidableLabs/urql) which interfaces with the [Urql Devtools](https://github.com/FormidableLabs/urql-devtools) browser extension.
 
 ## Usage
 
@@ -32,7 +32,7 @@ npm i -D @urql/devtools
 yarn add -D @urql/devtools
 ```
 
-Add the exchange to your Urql client
+Add the exchange to your `urql` client
 
 ```js
 import { createClient, defaultExchanges } from 'urql';
@@ -44,6 +44,8 @@ const client = createClient({
 });
 ```
 
-### Contributing
+> Note: we recommended putting this exchange before all other exchanges (as demonstrated above)
+
+## Contributing
 
 Have experience working with devtools extensions or want to get involved? Check out our [contributing](https://github.com/FormidableLabs/urql-devtools/blob/master/CONTRIBUTING.md) docs to get started.

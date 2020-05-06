@@ -1,87 +1,97 @@
 import { pipe, tap, take, toPromise } from 'wonka';
+import { Exchange, Client, Operation, OperationResult } from '@urql/core';
+import { DevtoolsExecuteQueryMessage } from './types';
 import {
-  Exchange,
-  Client,
-  Operation,
-  OperationResult,
-  DebugEventArg,
-} from '@urql/core';
-import {
-  DevtoolsExchangeOutgoingMessage,
-  DevtoolsExchangeOutgoingEventType,
-  ExecuteRequestMessage,
-  DevtoolsExchangeIncomingEventType,
-  DevtoolsExchangeIncomingMessage,
-} from './types';
-import { getDisplayName, hash } from './utils';
+  getDisplayName,
+  hash,
+  createDebugMessage,
+  createNativeMessenger,
+  createBrowserMessenger,
+  Messenger,
+} from './utils';
 import { parse } from 'graphql';
 
-declare const __pkg_version__: string;
+interface HandlerArgs {
+  sendMessage: Messenger['sendMessage'];
+}
 
-export const devtoolsExchange: Exchange = ({ client, forward }) => {
-  if (
-    typeof window === 'undefined' ||
-    process?.env?.NODE_ENV === 'production'
-  ) {
-    return (ops$) => pipe(ops$, forward);
-  }
-
-  window.__urql_devtools__ = {
+const curriedDevtoolsExchange: (a: Messenger) => Exchange = ({
+  sendMessage,
+  addMessageListener,
+}) => ({ client, forward }) => {
+  // Initialize connection
+  sendMessage({
+    type: 'connection-init',
+    source: 'exchange',
     version: __pkg_version__,
-  };
+  });
 
-  // Listen for messages from content script
-  window.addEventListener('message', ({ data, isTrusted }) => {
-    if (!isTrusted || data?.type !== DevtoolsExchangeIncomingEventType) {
+  // Listen for messages from devtools
+  addMessageListener((message) => {
+    if (message.source !== 'devtools' || !(message.type in messageHandlers)) {
       return;
     }
 
-    const message = data.message as DevtoolsExchangeIncomingMessage;
-
-    // const e = event as CustomEvent<DevtoolsExchangeIncomingMessage>;
-    const handler = messageHandlers[message.type];
-    handler && handler(client)(message);
+    messageHandlers[message.type]({ client, sendMessage })(message as any);
   });
-
-  // Tell the content script we are present
-  sendToContentScript({ type: 'init' });
 
   // Forward debug events to content script
   client.subscribeToDebugTarget &&
     client.subscribeToDebugTarget((event) =>
-      sendToContentScript({
-        type: 'debug',
+      sendMessage({
+        type: 'debug-event',
+        source: 'exchange',
         data: event,
       })
     );
 
-  return (ops$) => pipe(ops$, tap(handleOperation), forward, tap(handleResult));
+  return (ops$) =>
+    pipe(
+      ops$,
+      tap(handleOperation({ client, sendMessage })),
+      forward,
+      tap(handleResult({ client, sendMessage }))
+    );
 };
 
+interface HandlerArgs {
+  client: Client;
+  sendMessage: Messenger['sendMessage'];
+}
+
 /** Handle outgoing operations */
-const handleOperation = (operation: Operation) => {
+const handleOperation = ({ sendMessage }: HandlerArgs) => (
+  operation: Operation
+) => {
   if (operation.operationName === 'teardown') {
-    return sendDevtoolsDebug({
+    const msg = createDebugMessage({
       type: 'teardown',
       message: 'The operation has been torn down',
       operation,
     });
+
+    return sendMessage(msg);
   }
 
-  return sendDevtoolsDebug({
+  const msg = createDebugMessage({
     type: 'execution',
-    message: 'The client has recieved an execute command.',
+    message: 'The client has received an execute command.',
     operation,
     data: {
       sourceComponent: getDisplayName(),
     },
   });
+  return sendMessage(msg);
 };
 
 /** Handle new value or error */
-const handleResult = ({ operation, data, error }: OperationResult) => {
+const handleResult = ({ sendMessage }: HandlerArgs) => ({
+  operation,
+  data,
+  error,
+}: OperationResult) => {
   if (error) {
-    return sendDevtoolsDebug({
+    const msg = createDebugMessage({
       type: 'error',
       message: 'The operation has returned a new error.',
       operation,
@@ -89,9 +99,10 @@ const handleResult = ({ operation, data, error }: OperationResult) => {
         value: error,
       },
     });
+    return sendMessage(msg);
   }
 
-  return sendDevtoolsDebug({
+  const msg = createDebugMessage({
     type: 'update',
     message: 'The operation has returned a new response.',
     operation,
@@ -99,29 +110,13 @@ const handleResult = ({ operation, data, error }: OperationResult) => {
       value: data,
     },
   });
+  sendMessage(msg);
 };
 
-const sendToContentScript = (message: DevtoolsExchangeOutgoingMessage) =>
-  window.postMessage(
-    {
-      type: DevtoolsExchangeOutgoingEventType,
-      message: JSON.parse(JSON.stringify(message)),
-    },
-    window.location.origin
-  );
-
-const sendDevtoolsDebug = <T extends string>(debug: DebugEventArg<T>) =>
-  sendToContentScript({
-    type: 'debug',
-    data: {
-      ...debug,
-      source: 'devtoolsExchange',
-      timestamp: Date.now(),
-    },
-  });
-
-/** Handles execute request messages. */
-const requestHandler = (client: Client) => (message: ExecuteRequestMessage) => {
+/** Handle execute request message. */
+const handleExecuteQueryMessage = ({ client }: HandlerArgs) => (
+  message: DevtoolsExecuteQueryMessage
+) => {
   const isMutation = /(^|\W)+mutation\W/.test(message.query);
   const requestType = isMutation ? 'mutation' : 'query';
   const op = client.createRequestOperation(
@@ -140,7 +135,32 @@ const requestHandler = (client: Client) => (message: ExecuteRequestMessage) => {
   pipe(client.executeRequestOperation(op), take(1), toPromise);
 };
 
+/** Handle connection initiated by devtools. */
+const handleConnectionInitMessage = ({ sendMessage }: HandlerArgs) => () =>
+  sendMessage({
+    type: 'connection-acknowledge',
+    source: 'exchange',
+    version: __pkg_version__,
+  });
+
 /** Map of handlers for incoming messages. */
 const messageHandlers = {
-  request: requestHandler,
+  'execute-query': handleExecuteQueryMessage,
+  'connection-init': handleConnectionInitMessage,
 } as const;
+
+export const devtoolsExchange = ((): Exchange => {
+  const isNative = navigator?.product === 'ReactNative';
+  const isSSR = !isNative && typeof window === undefined;
+
+  // Prod or SSR
+  if (process.env.NODE_ENV === 'production' || isSSR) {
+    return ({ forward }) => (ops$) => pipe(ops$, forward);
+  }
+
+  if (isNative) {
+    return curriedDevtoolsExchange(createNativeMessenger());
+  }
+
+  return curriedDevtoolsExchange(createBrowserMessenger());
+})();
