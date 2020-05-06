@@ -154,7 +154,7 @@ export const devtoolsExchange = ((): Exchange => {
   const isSSR = !isNative && typeof window === undefined;
 
   // Prod or SSR
-  if (process?.env?.NODE_ENV === 'production' || isSSR) {
+  if (process.env.NODE_ENV === 'production' || isSSR) {
     return ({ forward }) => (ops$) => pipe(ops$, forward);
   }
 
