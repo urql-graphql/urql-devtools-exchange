@@ -1,0 +1,24 @@
+{
+  "rangeStrategy": "bump",
+  "extends": "config:base",
+  "labels": ["Maintenance"],
+  "packageRules": [
+    {
+      "packagePatterns": ["babel"],
+      "groupName": "babel"
+    },
+    {
+      "packagePatterns": ["jest"],
+      "groupName": "jest"
+    },
+    {
+      "packagePatterns": ["eslint"],
+      "groupName": "eslint"
+    },
+    {
+      "packagePatterns": ["rollup"],
+      "groupName": "rollup"
+    }
+  ],
+  "schedule": ["every weekday"]
+}
