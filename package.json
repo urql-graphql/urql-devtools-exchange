@@ -19,7 +19,7 @@
     "example:build": "cd example && NODE_ENV=development yarn build --no-minify",
     "prettier-check": "prettier -c .",
     "prepublishOnly": "run-s clean build",
-    "changelog": "docker run -it --rm -v \"$(pwd)\":/usr/local/src/your-app ferrarimarco/github-changelog-generator -u FormidableLabs -p urql-devtools-exchange"
+    "changelog": "docker run -it --rm -v \"$(pwd)\":/usr/local/src/your-app ferrarimarco/github-changelog-generator"
   },
   "repository": {
     "type": "git",
