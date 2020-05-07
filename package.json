@@ -89,6 +89,6 @@
   },
   "peerDependencies": {
     "@urql/core": ">= 1.11.0",
-    "graphql": ">= 15.0.0"
+    "graphql": ">= 0.11.0"
   }
 }
