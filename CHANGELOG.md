@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.0.2](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v2.0.2) (2020-05-07)
+
+[Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v2.0.1...v2.0.2)
+
+**Fixed bugs:**
+
+- Fix SSR detection [\#59](https://github.com/FormidableLabs/urql-devtools-exchange/pull/59) ([andyrichardson](https://github.com/andyrichardson))
+
 ## [v2.0.1](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v2.0.1) (2020-05-07)
 
 [Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v2.0.0...v2.0.1)
