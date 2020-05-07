@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.0.1](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v2.0.1) (2020-05-07)
+
+[Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v2.0.0...v2.0.1)
+
+**Fixed bugs:**
+
+- Wait for websocket connection before sending connnection-init message [\#56](https://github.com/FormidableLabs/urql-devtools-exchange/issues/56)
+
+**Merged pull requests:**
+
+- Wait for connection to be established before sending an init message [\#57](https://github.com/FormidableLabs/urql-devtools-exchange/pull/57) ([andyrichardson](https://github.com/andyrichardson))
+
 ## [v2.0.0](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v2.0.0) (2020-05-06)
 
 [Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v1.0.2...v2.0.0)
