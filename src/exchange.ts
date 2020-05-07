@@ -19,13 +19,6 @@ const curriedDevtoolsExchange: (a: Messenger) => Exchange = ({
   sendMessage,
   addMessageListener,
 }) => ({ client, forward }) => {
-  // Initialize connection
-  sendMessage({
-    type: 'connection-init',
-    source: 'exchange',
-    version: __pkg_version__,
-  });
-
   // Listen for messages from devtools
   addMessageListener((message) => {
     if (message.source !== 'devtools' || !(message.type in messageHandlers)) {

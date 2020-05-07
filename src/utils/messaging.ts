@@ -1,4 +1,8 @@
-import { ExchangeMessage, DevtoolsMessage } from '../types';
+import {
+  ExchangeMessage,
+  DevtoolsMessage,
+  ExchangeConnectionInitMessage,
+} from '../types';
 
 export interface Messenger {
   addMessageListener: (
@@ -6,6 +10,12 @@ export interface Messenger {
   ) => void;
   sendMessage: (m: ExchangeMessage) => void;
 }
+
+const connectionInitMessage: ExchangeConnectionInitMessage = {
+  source: 'exchange',
+  type: 'connection-init',
+  version: __pkg_version__,
+};
 
 /** Create curried args for native environment. */
 export const createNativeMessenger = (): Messenger => {
@@ -17,6 +27,9 @@ export const createNativeMessenger = (): Messenger => {
     timeout = undefined;
     ws = new WebSocket('ws://localhost:7700');
 
+    ws.onopen = () => {
+      ws.send(JSON.stringify(connectionInitMessage));
+    };
     ws.onclose = () => {
       timeout = timeout || setTimeout(createConnection, 500);
     };
@@ -50,20 +63,26 @@ export const createNativeMessenger = (): Messenger => {
 };
 
 /** Create curried args for browser environment. */
-export const createBrowserMessenger = (): Messenger => ({
-  addMessageListener: (cb) => {
-    window.addEventListener('message', ({ data, isTrusted }) => {
-      if (!isTrusted || !data?.source) {
-        return;
-      }
+export const createBrowserMessenger = (): Messenger => {
+  let listeners: Function[] = [];
 
-      cb(data as ExchangeMessage | DevtoolsMessage);
-    });
-  },
-  sendMessage: (message) => {
-    window.postMessage(
-      JSON.parse(JSON.stringify(message)),
-      window.location.origin
-    );
-  },
-});
+  window.addEventListener('message', ({ data, isTrusted }) => {
+    if (!isTrusted || !data?.source) {
+      return;
+    }
+
+    listeners.forEach((cb) => cb(data));
+  });
+
+  const addMessageListener: Messenger['addMessageListener'] = (cb) =>
+    (listeners = [...listeners, cb]);
+  const sendMessage: Messenger['sendMessage'] = (m) =>
+    window.postMessage(JSON.parse(JSON.stringify(m)), window.location.origin);
+
+  sendMessage(connectionInitMessage);
+
+  return {
+    addMessageListener,
+    sendMessage,
+  };
+};

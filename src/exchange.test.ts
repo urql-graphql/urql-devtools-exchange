@@ -67,17 +67,6 @@ describe('on mount', () => {
       expect(addMessageListener).toBeCalledTimes(1);
     });
   });
-
-  describe('init event', () => {
-    it('is dispatched', () => {
-      expect(sendMessage).toBeCalledTimes(1);
-      expect(sendMessage).toBeCalledWith({
-        type: 'connection-init',
-        source: 'exchange',
-        version,
-      });
-    });
-  });
 });
 
 describe('on debug message', () => {
@@ -95,7 +84,7 @@ describe('on debug message', () => {
     const subscriber = client.subscribeToDebugTarget.mock.calls[0][0];
     subscriber(event);
 
-    expect(sendMessage).toBeCalledTimes(2);
+    expect(sendMessage).toBeCalledTimes(1);
     expect(sendMessage).toBeCalledWith({
       type: 'debug-event',
       source: 'exchange',
@@ -119,7 +108,7 @@ describe('on operation', () => {
         publish
       );
       next(operation);
-      expect(sendMessage.mock.calls[1]).toMatchInlineSnapshot(`
+      expect(sendMessage.mock.calls[0]).toMatchInlineSnapshot(`
         Array [
           Object {
             "data": Object {
@@ -156,7 +145,7 @@ describe('on operation', () => {
         publish
       );
       next(operation);
-      expect(sendMessage.mock.calls[1]).toMatchInlineSnapshot(`
+      expect(sendMessage.mock.calls[0]).toMatchInlineSnapshot(`
         Array [
           Object {
             "data": Object {
@@ -227,7 +216,7 @@ describe('on operation response', () => {
       next(operation);
 
       // * call number two relates to the operation response
-      expect(sendMessage.mock.calls[2]).toMatchInlineSnapshot(`
+      expect(sendMessage.mock.calls[1]).toMatchInlineSnapshot(`
         Array [
           Object {
             "data": Object {
@@ -273,7 +262,7 @@ describe('on operation response', () => {
       );
       next(operation);
       // * call number two relates to the operation response
-      expect(sendMessage.mock.calls[2]).toMatchInlineSnapshot(`
+      expect(sendMessage.mock.calls[1]).toMatchInlineSnapshot(`
         Array [
           Object {
             "data": Object {
@@ -430,7 +419,7 @@ describe('on connection init message', () => {
 
   it('dispatches acknowledge event w/ version', () => {
     handler(getVersionMessage);
-    expect(sendMessage).toBeCalledTimes(2);
+    expect(sendMessage).toBeCalledTimes(1);
     expect(sendMessage).toBeCalledWith({
       type: 'connection-acknowledge',
       source: 'exchange',
