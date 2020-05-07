@@ -25,6 +25,20 @@ describe('on create native messenger', () => {
     `);
   });
 
+  describe('on open', () => {
+    it('sends connection-init message', () => {
+      createNativeMessenger();
+      instance.send = jest.fn();
+      instance.onopen();
+      expect(instance.send).toBeCalledTimes(1);
+      expect(instance.send.mock.calls[0]).toMatchInlineSnapshot(`
+        Array [
+          "{\\"source\\":\\"exchange\\",\\"type\\":\\"connection-init\\",\\"version\\":\\"200.0.0\\"}",
+        ]
+      `);
+    });
+  });
+
   describe('on close', () => {
     it('tries to establish a new connection', () => {
       createNativeMessenger();
@@ -77,6 +91,24 @@ describe('on create browser messenger', () => {
   const addEventListener = jest.spyOn(window, 'addEventListener');
   const postMessage = jest.spyOn(window, 'postMessage');
 
+  describe('on create', () => {
+    it('sends connection-init message', () => {
+      createBrowserMessenger();
+
+      expect(postMessage).toBeCalledTimes(1);
+      expect(postMessage.mock.calls[0]).toMatchInlineSnapshot(`
+        Array [
+          Object {
+            "source": "exchange",
+            "type": "connection-init",
+            "version": "200.0.0",
+          },
+          "http://localhost",
+        ]
+      `);
+    });
+  });
+
   describe('on trusted message', () => {
     it('calls message listeners', () => {
       const data = {
@@ -126,8 +158,8 @@ describe('on create browser messenger', () => {
 
       const m = createBrowserMessenger();
       m.sendMessage(data as any);
-      expect(postMessage).toBeCalledTimes(1);
-      expect(postMessage.mock.calls[0][0]).toMatchInlineSnapshot(`
+      expect(postMessage).toBeCalledTimes(2);
+      expect(postMessage.mock.calls[1][0]).toMatchInlineSnapshot(`
         Object {
           "arg": 1234,
           "someString": "hello",
