@@ -62,7 +62,7 @@
     "@urql/core": "^1.11.0",
     "babel-plugin-closure-elimination": "^1.3.1",
     "babel-plugin-transform-async-to-promises": "^0.8.15",
-    "eslint": "^6.8.0",
+    "eslint": "^7.0.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.20.2",
     "graphql": "^15.0.0",
