@@ -14,6 +14,7 @@
     "prettier",
     "prettier/@typescript-eslint"
   ],
+  "plugins": ["import"],
   "rules": {
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/naming-convention": [
@@ -23,6 +24,13 @@
         "selector": "typeLike",
         "format": ["PascalCase"]
       }
+    ],
+    "import/no-internal-modules": "off",
+    "import/no-default-export": ["error"],
+    "import/no-duplicates": ["error"],
+    "import/order": [
+      "error",
+      { "newlines-between": "never", "alphabetize": { "order": "asc" } }
     ],
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/member-ordering": "off",
@@ -34,7 +42,6 @@
     "@typescript-eslint/array-type": "off",
     "sort-keys": "off",
     "no-console": ["error", { "allow": ["warn", "error"] }],
-    "import/no-internal-modules": "off",
     "prefer-arrow/prefer-arrow-functions": "off"
   }
 }

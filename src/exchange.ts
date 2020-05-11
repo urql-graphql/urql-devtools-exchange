@@ -1,5 +1,6 @@
-import { pipe, tap, take, toPromise } from 'wonka';
 import { Exchange, Client, Operation, OperationResult } from '@urql/core';
+import { parse } from 'graphql';
+import { pipe, tap, take, toPromise } from 'wonka';
 import { DevtoolsExecuteQueryMessage } from './types';
 import {
   getDisplayName,
@@ -9,7 +10,6 @@ import {
   createBrowserMessenger,
   Messenger,
 } from './utils';
-import { parse } from 'graphql';
 
 interface HandlerArgs {
   sendMessage: Messenger['sendMessage'];

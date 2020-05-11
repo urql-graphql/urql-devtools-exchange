@@ -1,11 +1,11 @@
 import { basename } from 'path';
 import { DEFAULT_EXTENSIONS } from '@babel/core';
 import replace from '@rollup/plugin-replace';
-import commonjs from 'rollup-plugin-commonjs';
-import nodeResolve from 'rollup-plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import nodeResolve from '@rollup/plugin-node-resolve';
+import buble from '@rollup/plugin-buble';
+import babel from '@rollup/plugin-babel';
 import typescript from 'rollup-plugin-typescript2';
-import buble from 'rollup-plugin-buble';
-import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 
 const pkgInfo = require('./package.json');
