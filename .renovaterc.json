@@ -20,5 +20,6 @@
       "groupName": "rollup"
     }
   ],
-  "schedule": ["every weekday"]
+  "lockFileMaintenance": { "enabled": true },
+  "schedule": ["every friday"]
 }
