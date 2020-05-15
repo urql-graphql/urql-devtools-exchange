@@ -61,6 +61,7 @@ const handleOperation = ({ sendMessage }: HandlerArgs) => (
       type: 'teardown',
       message: 'The operation has been torn down',
       operation,
+      data: undefined,
     });
 
     return sendMessage(msg);

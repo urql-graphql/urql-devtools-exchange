@@ -2,7 +2,8 @@ import '@urql/core';
 
 declare module '@urql/core' {
   interface DebugEventTypes {
-    teardown: never;
+    /** Typescript won't let us explicitly state this value as undefined w/ no property */
+    teardown: undefined;
     /** An execute[query|mutation|subscription] call. */
     execution: {
       sourceComponent: string;
