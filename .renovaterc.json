@@ -4,6 +4,10 @@
   "labels": ["Maintenance"],
   "packageRules": [
     {
+      "depTypeList": ["peerDependencies"],
+      "enabled": false
+    },
+    {
       "packagePatterns": ["babel"],
       "groupName": "babel"
     },
