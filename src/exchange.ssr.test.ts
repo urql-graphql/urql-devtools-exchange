@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 import { fromValue } from 'wonka';
-import * as messengers from './utils';
+import * as messengers from './utils/messaging';
 
 const createNativeMessenger = jest.spyOn(messengers, 'createNativeMessenger');
 const createBrowserMessenger = jest.spyOn(messengers, 'createBrowserMessenger');
