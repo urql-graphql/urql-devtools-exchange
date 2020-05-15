@@ -149,6 +149,7 @@ describe('on operation', () => {
         Array [
           Object {
             "data": Object {
+              "data": undefined,
               "message": "The operation has been torn down",
               "operation": Object {
                 "operationName": "teardown",
