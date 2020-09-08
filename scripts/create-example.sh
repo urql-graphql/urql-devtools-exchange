@@ -6,9 +6,9 @@ rm -r $CWD/../example
 
 # Pull urql example and put in example folder
 mkdir $TMP
-curl -SL https://github.com/FormidableLabs/urql/archive/master.zip > $TMP/master.zip
-unzip $TMP/master.zip "urql-master/packages/react-urql/examples/1-getting-started/*" $TMP
-mv urql-master/packages/react-urql/examples/1-getting-started $CWD/../example
+curl -SL https://github.com/FormidableLabs/urql/archive/main.zip > $TMP/main.zip
+unzip $TMP/main.zip "urql-main/packages/react-urql/examples/1-getting-started/*" $TMP
+mv urql-main/packages/react-urql/examples/1-getting-started $CWD/../example
 rm -r $TMP
 
 # Add link for exchange
