@@ -909,12 +909,12 @@
     semver "^7.3.2"
     tsutils "^3.17.1"
 
-"@urql/core@^1.11.8":
-  version "1.11.8"
-  resolved "https://registry.yarnpkg.com/@urql/core/-/core-1.11.8.tgz#6a3186ac84d6b08752585f42e8ec81539338d7a9"
-  integrity sha512-lBlCjw3sLlblGIzRVg583IdsONUIt04f/LHI0oiEgNlPViZcRR3B31LCKyOChba/klIqSaDivaqCfzg5wyTPoQ==
+"@urql/core@^1.13.1":
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/@urql/core/-/core-1.13.1.tgz#7247c27dccd7570010de91730d1f16fd15892829"
+  integrity sha512-Zl4UwvcE9JbWKzrtxnlmfF+rkX50GzK5dpMlB6FnUYF0sLmuGMxp67lnhTQsfTNJ+41bkj4lk0PMWEnG7KUsTw==
   dependencies:
-    wonka "^4.0.10"
+    wonka "^4.0.14"
 
 abab@^2.0.3:
   version "2.0.3"
@@ -5190,10 +5190,15 @@ which@^2.0.1, which@^2.0.2:
   dependencies:
     isexe "^2.0.0"
 
-"wonka@>= 4.0.9", wonka@^4.0.10:
+"wonka@>= 4.0.9":
   version "4.0.13"
   resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.13.tgz#8d188160bd5742870c78ede7a4eba686d089a33f"
   integrity sha512-aWg92IVvbP/kp+q9rw+k/Uw3C/S2J0dTDNhEhivGVH3GXJZgpFk2nuyVtiS7Y1d0UG3m4jvOrR7bPXim6D/TBg==
+
+wonka@^4.0.14:
+  version "4.0.14"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.14.tgz#77d680a84e575ed15a9f975eb87d6c530488f3a4"
+  integrity sha512-v9vmsTxpZjrA8CYfztbuoTQSHEsG3ZH+NCYfasHm0V3GqBupXrjuuz0RJyUaw2cRO7ouW2js0P6i853/qxlDcA==
 
 word-wrap@^1.2.3, word-wrap@~1.2.3:
   version "1.2.3"
