@@ -23,9 +23,16 @@ export const createNativeMessenger = (): Messenger => {
   let ws: WebSocket;
   let timeout: NodeJS.Timeout | undefined;
 
+  // Check for Android, where we need to use the special `10.0.2.2` host alias
+  const Platform = require('react-native').Platform as
+    | import('react-native').PlatformAndroidStatic
+    | import('react-native').PlatformIOSStatic;
+
+  const host = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
+
   const createConnection = () => {
     timeout = undefined;
-    ws = new WebSocket('ws://localhost:7700');
+    ws = new WebSocket(`ws://${host}:7700`);
 
     ws.onopen = () => {
       ws.send(JSON.stringify(connectionInitMessage));
