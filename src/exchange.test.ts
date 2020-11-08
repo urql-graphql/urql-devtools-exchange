@@ -28,8 +28,8 @@ let forward: any;
 beforeEach(() => {
   client = {
     url: 'url_stub',
-    createRequestOperation: jest.fn((operationName, data, meta) => ({
-      operationName,
+    createRequestOperation: jest.fn((kind, data, meta) => ({
+      kind,
       ...data,
       context: {
         meta,
@@ -97,7 +97,7 @@ describe('on operation', () => {
   describe('on execute', () => {
     it('dispatches debug "update" event', () => {
       const operation = {
-        operationName: 'query',
+        kind: 'query',
       };
 
       const { source, next } = makeSubject<any>();
@@ -117,7 +117,7 @@ describe('on operation', () => {
               },
               "message": "The client has received an execute command.",
               "operation": Object {
-                "operationName": "query",
+                "kind": "query",
               },
               "source": "devtoolsExchange",
               "timestamp": 1234,
@@ -134,7 +134,7 @@ describe('on operation', () => {
   describe('on teardown', () => {
     it('dispatches debug "teardown" event', () => {
       const operation = {
-        operationName: 'teardown',
+        kind: 'teardown',
       };
 
       const { source, next } = makeSubject<any>();
@@ -152,7 +152,7 @@ describe('on operation', () => {
               "data": undefined,
               "message": "The operation has been torn down",
               "operation": Object {
-                "operationName": "teardown",
+                "kind": "teardown",
               },
               "source": "devtoolsExchange",
               "timestamp": 1234,
@@ -168,7 +168,7 @@ describe('on operation', () => {
 
   it('forwards operations', () => {
     const operation = {
-      operationName: 'query',
+      kind: 'query',
       key: 1,
     };
 
@@ -198,7 +198,7 @@ describe('on operation response', () => {
   describe('on data', () => {
     it('dispatches update event', () => {
       const operation = {
-        operationName: 'mutation',
+        kind: 'mutation',
       };
       forward.mockImplementation((o) =>
         map((operation) => ({
@@ -228,7 +228,7 @@ describe('on operation response', () => {
               },
               "message": "The operation has returned a new response.",
               "operation": Object {
-                "operationName": "mutation",
+                "kind": "mutation",
               },
               "source": "devtoolsExchange",
               "timestamp": 1234,
@@ -245,7 +245,7 @@ describe('on operation response', () => {
   describe('on error', () => {
     it('dispatches update event', () => {
       const operation = {
-        operationName: 'mutation',
+        kind: 'mutation',
       };
       forward.mockImplementation((o) =>
         map((operation) => ({
@@ -274,7 +274,7 @@ describe('on operation response', () => {
               },
               "message": "The operation has returned a new error.",
               "operation": Object {
-                "operationName": "mutation",
+                "kind": "mutation",
               },
               "source": "devtoolsExchange",
               "timestamp": 1234,
@@ -322,7 +322,7 @@ describe('on request message', () => {
             },
           },
           "key": 1063934861,
-          "operationName": "query",
+          "kind": "query",
           "query": Object {
             "definitions": Array [
               Object {
