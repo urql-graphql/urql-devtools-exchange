@@ -56,7 +56,7 @@ interface HandlerArgs {
 const handleOperation = ({ sendMessage }: HandlerArgs) => (
   operation: Operation
 ) => {
-  if (operation.operationName === 'teardown') {
+  if (operation.kind === 'teardown') {
     const msg = createDebugMessage({
       type: 'teardown',
       message: 'The operation has been torn down',
