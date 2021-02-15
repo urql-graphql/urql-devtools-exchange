@@ -1,5 +1,20 @@
 # Changelog
 
+## [v2.0.3](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v2.0.3) (2021-02-15)
+
+[Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v2.0.2...v2.0.3)
+
+**Closed issues:**
+
+- Anything special to get this working in Expo? [\#109](https://github.com/FormidableLabs/urql-devtools-exchange/issues/109)
+- Replace Operation.operationName usage with Operation.kind [\#105](https://github.com/FormidableLabs/urql-devtools-exchange/issues/105)
+- urql devtools when page is inside an iframe [\#98](https://github.com/FormidableLabs/urql-devtools-exchange/issues/98)
+
+**Merged pull requests:**
+
+- Use the new @urql/core to avoid using the deprecated property [\#108](https://github.com/FormidableLabs/urql-devtools-exchange/pull/108) ([JoviDeCroock](https://github.com/JoviDeCroock))
+- Rebuild lockfile [\#62](https://github.com/FormidableLabs/urql-devtools-exchange/pull/62) ([andyrichardson](https://github.com/andyrichardson))
+
 ## [v2.0.2](https://github.com/FormidableLabs/urql-devtools-exchange/tree/v2.0.2) (2020-05-07)
 
 [Full Changelog](https://github.com/FormidableLabs/urql-devtools-exchange/compare/v2.0.1...v2.0.2)
