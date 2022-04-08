@@ -14,6 +14,9 @@
   <a href="https://github.com/FormidableLabs/urql-devtools-exchange/blob/master/LICENSE">
     <img alt="Licence MIT" src="https://badgen.net/github/license/FormidableLabs/urql-devtools-exchange" />
   </a>
+  <a href="https://github.com/FormidableLabs/urql-devtools-exchange#maintenance-status">
+    <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-active-green.svg?color=brightgreen&style=flat" />
+  </a>
 </div>
 
 ## About
@@ -49,7 +52,6 @@ const client = createClient({
 ## Contributing
 
 Have experience working with devtools extensions or want to get involved? Check out our [contributing](https://github.com/FormidableLabs/urql-devtools/blob/master/CONTRIBUTING.md) docs to get started.
-
 
 ## Maintenance Status
 
