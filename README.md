@@ -26,10 +26,10 @@ Install this package
 
 ```sh
 # npm
-npm i @urql/devtools
+npm i -D @urql/devtools
 
 # yarn
-yarn add @urql/devtools
+yarn add -D @urql/devtools
 ```
 
 Add the exchange to your `urql` client
